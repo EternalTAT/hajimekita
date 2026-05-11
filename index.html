@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>你看什么看？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: text;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Noto Sans CJK SC', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            position: relative;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(20, 25, 40, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .game-bg-decoration {
+            background: radial-gradient(ellipse at 20% 30%, rgba(90, 130, 200, 0.25), transparent 70%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #FFF5E6;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            padding: 1rem 0 0.8rem 0;
+        }
+
+        .game-title-main {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: none;
+            margin-bottom: 6px;
+        }
+        .game-title-sub {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+            border-top: 1px solid rgba(255,200,100,0.5);
+            padding-top: 6px;
+            display: inline-block;
+            color: #f0e2c5;
+            transition: visibility 0.1s ease;
+        }
+
+        .dialogue-area {
+            min-height: 380px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding: 28px 32px;
+            scroll-behavior: smooth;
+            background: rgba(0, 0, 0, 0.4);
+            margin: 10px 16px 16px 16px;
+            border-radius: 32px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .dialogue-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .dialogue-area::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .dialogue-area::-webkit-scrollbar-thumb {
+            background: #ffd966;
+            border-radius: 8px;
+        }
+
+        .dialogue-line {
+            font-size: 1.25rem;
+            line-height: 1.65;
+            color: #f3efe7;
+            text-shadow: 1px 1px 2px black;
+            margin-bottom: 1.25rem;
+            letter-spacing: 0.02em;
+            animation: fadeSlideUp 0.28s ease-out;
+            border-left: 3px solid #ffb347;
+            padding-left: 18px;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ruby {
+            ruby-align: center;
+        }
+        rt {
+            font-size: 0.7rem;
+            color: #ffe0a3;
+            letter-spacing: 0.5px;
+            font-weight: normal;
+            text-shadow: none;
+            background: rgba(0,0,0,0.4);
+            padding: 0 2px;
+            border-radius: 6px;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px 28px 28px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .advance-area {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .click-hint {
+            background: rgba(255, 200, 100, 0.2);
+            backdrop-filter: blur(4px);
+            border-radius: 60px;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            color: #ffdfaa;
+            border: 1px solid rgba(255, 210, 110, 0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .click-hint:hover {
+            background: rgba(255, 200, 100, 0.4);
+            color: #fff2df;
+            transform: scale(0.98);
+        }
+
+        .reset-btn, .sponsor-btn {
+            background: #2a2f3f;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #f5e7ce;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-family: inherit;
+            backdrop-filter: blur(2px);
+            border: 1px solid #5f6b7e;
+        }
+        .sponsor-btn {
+            background: #3f2e2c;
+            border-color: #ffb347;
+            color: #ffefcf;
+        }
+        .reset-btn:hover {
+            background: #3f455b;
+            color: #fff0dd;
+            border-color: #ffb966;
+        }
+        .sponsor-btn:hover {
+            background: #634e4a;
+            border-color: #ffcc88;
+            transform: scale(0.97);
+        }
+        
+        .progress-indicator {
+            background: #1e2438b3;
+            border-radius: 40px;
+            padding: 5px 18px;
+            font-size: 0.85rem;
+            color: #cdd9ff;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .game-container {
+            cursor: pointer;
+        }
+
+        .dialogue-area {
+            cursor: text;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s ease;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-card {
+            background: rgba(25, 30, 45, 0.95);
+            border-radius: 48px;
+            max-width: 85vw;
+            width: 500px;
+            border: 1px solid rgba(255, 200, 100, 0.5);
+            box-shadow: 0 30px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,240,0.1);
+            padding: 30px 28px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            animation: floatIn 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .sponsor-list {
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            border-radius: 32px;
+            padding: 12px 20px;
+        }
+        .sponsor-list p {
+            color: #f5e7ce;
+            font-size: 1rem;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255,200,100,0.3);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sponsor-list p:before {
+            content: "⭐";
+            font-size: 1.1rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .modal-btn {
+            background: #3a2e2a;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #ffeaC5;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border: 1px solid #ffb347;
+        }
+        .modal-btn-primary {
+            background: #ffb347;
+            color: #1e1b1a;
+            border: none;
+        }
+        .modal-btn-primary:hover {
+            background: #ffa01e;
+            transform: scale(0.97);
+        }
+        .modal-btn:hover {
+            background: #5f4a44;
+            transform: translateY(-2px);
+        }
+        .image-modal-content {
+            text-align: center;
+        }
+        .sponsor-img {
+            max-width: 100%;
+            border-radius: 32px;
+            margin: 16px 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border: 2px solid #ffd58c;
+        }
+        .close-img-btn {
+            margin-top: 12px;
+            background: #2a2f3f;
+            border: 1px solid #ffaa55;
+        }
+        .sponsor-note {
+            font-size: 0.75rem;
+            color: #c9bb9b;
+            margin-top: 8px;
+        }
+
+        .easter-egg-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #f9d976, #f39f86);
+            color: #1f1b15;
+            padding: 20px 32px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            z-index: 10000;
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.6), 0 20px 35px rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            font-family: monospace;
+            letter-spacing: 2px;
+            border: 1px solid #fff4c2;
+            animation: eggPop 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), eggFade 3s ease forwards;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(255,255,200,0.8);
+        }
+
+        @keyframes eggPop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.6);
+            }
+            70% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.08);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes eggFade {
+            0% { opacity: 1; visibility: visible; }
+            80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        @media (max-width: 640px) {
+            .dialogue-area {
+                padding: 20px 16px;
+                max-height: 420px;
+            }
+            .dialogue-line {
+                font-size: 1rem;
+                padding-left: 12px;
+            }
+            .action-bar {
+                padding: 12px 20px 24px 20px;
+            }
+            .click-hint, .reset-btn, .sponsor-btn {
+                padding: 6px 16px;
+                font-size: 0.8rem;
+            }
+            .modal-card {
+                width: 90vw;
+                padding: 20px;
+            }
+            .easter-egg-toast {
+                font-size: 1rem;
+                padding: 14px 24px;
+                white-space: normal;
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="game-container" id="gameContainer">
+    <div class="game-bg-decoration">
+        <div class="game-title-main">创北GAL GAME欠费版</div>
+        <div class="game-title-sub" id="startHintSub">⚡ 点击任意处开始正文 ⚡</div>
+    </div>
+    <div class="game-bg-decoration" style="border-bottom: none; padding:0; background:transparent;"></div>
+    <div class="dialogue-area" id="dialogueArea"></div>
+    <div class="action-bar">
+        <div class="progress-indicator" id="progressText">📜 0 / 0</div>
+        <div class="advance-area">
+            <div class="click-hint" id="clickAdvanceBtn">
+                ▶ 点击继续 · 下一句
+            </div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="reset-btn" id="resetBtn">⟳ 重新开始</button>
+            <button class="sponsor-btn" id="sponsorListBtn">🌟 赞助者名单</button>
+        </div>
+    </div>
+</div>
+
+<div id="sponsorModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>✨ 赞助本项目的人 ✨</h3>
+        <div class="sponsor-list" id="sponsorListContainer">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn" id="closeSponsorModalBtn">🏠 回到主界面</button>
+            <button class="modal-btn modal-btn-primary" id="openSponsorImageBtn">🎁 打开赞助界面</button>
+        </div>
+        <div class="sponsor-note">感谢每一位热心的朋友，因为有你们故事延续</div>
+    </div>
+</div>
+<div id="sponsorImageModal" class="modal-overlay">
+    <div class="modal-card image-modal-content">
+        <h3>❤️ 赞助支持展台 ❤️</h3>
+        <img id="sponsorDisplayImg" class="sponsor-img" src="thanks.jpg" alt="赞助感谢图">
+        <div class="modal-buttons">
+            <button class="modal-btn close-img-only" id="closeImageModalBtn">🔙 关闭赞助界面</button>
+        </div>
+        <div class="sponsor-note">每一份支持都让世界变得更加温柔</div>
+    </div>
+</div>
+
+<script>
+    // ======================= 剧本 ========================
+    const SCRIPT = [
+            "观前提示：<br>本作中所有角色均已成年，并且无任何不良暗示，请注意甄别。剧情中的所有文本均可直接复制。<br>因为写代码的那个人懒，没有测试手机端阅读功能是否正常，因此出现了bug可以直接去私信说明。<br><br>特别鸣谢：<br>（目前还没想好写谁）",
+            "如果你能够看到这串按理来说看不到的文字，那就说明你偷看我的源代码了。",
+
+            "天空像是被谁撕开了一道口子，雷声从裂缝里滚落下来，轰隆隆地砸在窗玻璃上。",
+            "整栋老旧的公寓楼都跟着颤了颤，九霄蜷在沙发上的身子微微一抖。",
+            "身后传来轻微的脚步声声，然后是一双手臂温柔地拢过来。",
+            "北笙的胸膛贴上她的后背，温热的手掌覆上她耳尖，刚好把下一声炸雷隔绝在外。",
+            "「别怕，我在呢。」",
+            "他的声音很低。",
+            "但是却比窗外任何一记响雷都更有分量。",
+            "九霄顺势靠进那个熟悉的怀抱，雷声远了，模糊了，变成背景里闷闷的喘息。取而代之的，是背后一下一下有力的心跳，沉稳得像在替这个世界打着节拍。",
+            "她把脸埋进他胸口，声音闷闷的，软得像化开的糖。",
+            "「你也只有这种时候才像是我的哥哥了。」",
+            "北笙低头看她。从这个角度只能看见她微微翘起的发旋，和她不自觉地变红的耳廓。",
+            "他没来由地觉得嗓子有点紧，手臂不自觉地收紧了些。",
+            "「但我们现在是恋人不是吗？」",
+            "这话一出口，怀里的人明显僵了一瞬。",
+            "九霄耳尖上的粉色迅速蔓延到脸颊。",
+            "她轻轻挣了一下，当然没挣开，于是声音里带上了几分恼羞成软的意味。",
+            "顿了顿，又小声补了一句，像是自言自语，又像是在说服自己。",
+            "「嘛，虽然我们之间没有血缘关系，但是我姑且还是会把你当哥哥来看待的。」",
+            "北笙没接话。他知道她还有下文。",
+            "果然，沉默了几秒，九霄的声音更小了，小到几乎要被窗外的雨声吞没。",
+            "「毕竟要不是为了供你这个无能的哥哥上大学，我才不会那么拼去当偶像呢……」",
+            "北笙嘴角弯起来，下巴抵在她柔软的发顶上。洗发水的味道淡淡的，混着窗外雨水的气息。",
+            "「是是是，多亏了九霄大人。」",
+            "他的声音里有种藏不住的笑意，更多的却是某种说不清的心疼。",
+            "「那，这位大明星，能不能让哥哥再多抱一会儿？」",
+            "九霄没有回答。",
+            "但北笙却能够感受到，垂在他身侧的手指悄悄攥紧了他的衣角。",
+            "窗外雷声渐远，雨还淅淅沥沥地下着。",
+            "老旧公寓的客厅里，两个人安静地抱着，谁也没有再说话。",
+            "（场景转换）",
+            "第二天清晨，阳光从窗帘缝隙偷偷溜进来，在地板上画出一条细细的金线。",
+            "九霄先醒了。",
+            "她侧过脸，看着身边还在睡梦中的北笙。",
+            "睡着的时候他看起来比平时还要年轻，眉目舒展着，唇边似乎还挂着一点若有若无的笑。她忍不住伸出手指，轻轻戳了戳他的脸颊。",
+            "软软的。",
+            "她无声地笑起来，轻手轻脚地掀开被子下了床，赤着脚踩在冰凉的地板上，整个人轻快得像只猫。",
+            "围裙系在腰上的动作行云流水。煎蛋在平底锅里滋滋地响着，边缘微微焦黄，她熟练地翻了个面，顺手把牛奶倒进锅里温着。",
+            "她一边哼着自己新单曲的旋律，一边继续做着早餐，哼到副歌部分的时候记起来是首情歌，耳根又悄悄地红了。",
+            "「哥哥，起床啦。」",
+            "她回到床边，俯下身子，声音温柔地说。顺手把被子往下拉了拉，露出北笙睡得乱糟糟的头发。",
+            "北笙迷迷糊糊地睁开眼，阳光逆着九霄的身影洒下来，她整个人都被镀上了一层淡淡的光。他眨了眨眼，恍惚间觉得这辈子大概就是为了每天早上的这个瞬间。",
+            "早餐很安静。",
+            "九霄用叉子戳着煎蛋，蛋黄液慢慢淌出来，她也不急着吃，眼神时不时地飘向对面正埋头吃着的北笙，嘴角的弧度怎么都压不下去。",
+            "北笙自然注意到了，但没有戳穿她。",
+            "吃完早餐后，两人准备去上学了。",
+            "九霄站在玄关，手扶着鞋柜，左脚已经踩上了小皮鞋，却突然不动了。",
+            "她扯住北笙的袖子，仰起头。晨光里她的眼睛亮得像蓄了一汪水，声音又软又黏，像在撒娇又像在理所当然地讨要着什么。",
+            "「哥哥，人家想要那个嘛。」",
+            "北笙系鞋带的手顿了一下。",
+            "「哪个？」",
+            "九霄的脸上浮起一层薄红，却没有移开视线，眼睛亮晶晶地盯着他，像是在盯着一颗很想吃到的糖果。",
+            "北笙心里清楚得很，但还是忍不住想逗她。他嘴角微微上扬，明知故问。",
+            "「你不说出来我怎么知道？」",
+            "九霄的脚轻轻跺了一下地板。",
+            "但是北笙还是装作一副什么都不知道的样子看着她。",
+            "「就是……<ruby>mua<rt>亲亲</rt></ruby>啦！」",
+            "她几乎是喊出来的，尾音却在一半的地方软了下去。脸红得像要烧起来，却还要嘴硬般地瞪着北笙。",
+            "「为什么非要人家说出来啊，哥哥坏！」",
+            "北笙终于没忍住笑出了声。他弯下腰，一只手扶住她的肩膀，在她额头上轻轻印下一个吻。然后顿了顿，又飞快地偏过头，在她嘴角处落下了第二个。",
+            "九霄的耳朵红透了。但她却并没有躲,同时用手偷偷地摸了一下北笙的口袋。",
+            "「这还差不多嘛……」",
+            "她小声嘟囔着，声音闷在围巾里，但眼睛里的光怎么都藏不住。",
+            "两个人磨蹭了半天，终于出了门。",
+            "楼道里北笙推着他那辆破旧的自行车，链条发出咔嗒咔嗒的声响。",
+            "九霄走在他身后，踩着他的影子，两个人在狭窄的楼梯间一前一后地往下走。",
+            "出了小区门口，一个向左，一个向右，往同一个城市的不同方向。",
+            "北笙骑着自行车往XX大学赶。那是一所说不上好也说不上坏的学校，跟他的成绩一样，平平无奇，普普通通。",
+            "春风灌进他的校服袖子，鼓鼓囊囊的，他一只手扶着车把，另一只手无意识地在口袋里摸了摸。",
+            "那里有早晨九霄悄悄塞进去的一颗奶糖。",
+            "九霄要坐地铁去YY中学。那是全市数一数二的重点中学，她穿着校服裙站在站台上，旁边的大叔认出了她，激动地掏出手机拍照。",
+            "她条件反射般地露出标准的偶像微笑，心里却在想她的哥哥现在走到哪里了，会不会迟到。",
+            "今天实在踩不上点了。",
+            "北笙和九霄两人几乎同时如此想到。",
+            "九霄几乎是贴着上课铃冲进教室的。她气喘吁吁地站在门口，胸口还在剧烈起伏，额前的碎发被汗粘在皮肤上。",
+            "班主任推了推眼镜，镜片反了一下光。",
+            "「九霄同学，你又迟到了。」",
+            "她的声音不大，但教室里安静得能听见窗外操场上体育课的哨声。",
+            "「虽然你是偶像，但学校有学校的规定。」",
+            "九霄低下头，刘海遮住了大半张脸。班主任以为她在反省，其实她的嘴角正偷偷地翘起来。然后她在心里把哥哥骂了三遍——不对，是四遍。",
+            "而北笙在大学那边也好不到哪里去。",
+            "阶梯教室里教授已经开始点名，他猫着腰从后门溜进来，书包带子从肩膀上滑下去，手忙脚乱地去接，发出不小的动静。室友回过头来嘲笑他。",
+            "「又、迟、到、啊、臭、妹、控。」",
+            "北笙瞪了他一眼，在旁边的座位上坐下来，翻开课本才发现拿错了。",
+            "早上出门太急，他拿的是九霄的笔记本。",
+            "翻开第一页，是她工工整整的字迹：「笨蛋哥哥专用记事本。」，旁边还画了个气鼓鼓的小人。",
+            "他的手指在那一行字上停了一会儿，然后慢慢弯起嘴角。",
+            "窗外，五月初的风轻轻吹过，吹动了两扇不同方向窗户的窗帘。这个城市的东边和西边，两个正在上课的人，在同一秒不约而同地抬起头看了一眼窗外。",
+            "然后又在同一秒，不约而同地想——",
+            "明天，明天一定早点出门。"
+    ];
+
+    const STORY_START_INDEX = 2;
+    const TOTAL_STORY_LEN = SCRIPT.length - STORY_START_INDEX;
+    const dialogueArea = document.getElementById('dialogueArea');
+    const progressSpan = document.getElementById('progressText');
+    const resetBtn = document.getElementById('resetBtn');
+    const advanceBtn = document.getElementById('clickAdvanceBtn');
+    const gameContainer = document.getElementById('gameContainer');
+    const startHintSub = document.getElementById('startHintSub');
+    let isDisclaimerMode = true;
+    let currentStoryIndex = STORY_START_INDEX;
+    let displayedStoryCount = 0;
+    let postEndClickCount = 0;
+    let eggTriggered = false;
+    const sponsorModal = document.getElementById('sponsorModal');
+    const sponsorImageModal = document.getElementById('sponsorImageModal');
+    const sponsorListContainer = document.getElementById('sponsorListContainer');
+    const closeSponsorBtn = document.getElementById('closeSponsorModalBtn');
+    const openSponsorImageBtn = document.getElementById('openSponsorImageBtn');
+    const closeImageModalBtn = document.getElementById('closeImageModalBtn');
+    const sponsorListBtn = document.getElementById('sponsorListBtn');
+    const SPONSOR_IMAGE_URL = "https://hi.wzznft.com/i/2026/05/11/ouafn7.jpg";
+    const sponsors = [
+        "✨ 北笙大人后援会会长",
+        "🌸 九霄全球粉丝团",
+        "💰 匿名爱心学长",
+        "🍁 创北工作室 运营组",
+        "🎧 雨天听雷的小A",
+        "📖 故事里的旅人·清韵",
+        "⭐ 汽水味の应援者",
+        "✨ 软糖骑士团"
+    ];
+
+    function renderSponsorList() {
+        sponsorListContainer.innerHTML = '';
+        sponsors.forEach(name => {
+            const p = document.createElement('p');
+            p.textContent = name;
+            sponsorListContainer.appendChild(p);
+        });
+    }
+
+
+    function openSponsorListModal() {
+        renderSponsorList();
+        sponsorModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSponsorListModal() {
+        sponsorModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openSponsorImageModalFn() {
+        const imgElement = document.getElementById('sponsorDisplayImg');
+        if (imgElement) imgElement.src = SPONSOR_IMAGE_URL;
+        sponsorImageModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSponsorImageModal() {
+        sponsorImageModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function hideStartHint() {
+        if (startHintSub) {
+            startHintSub.style.visibility = 'hidden';
+        }
+    }
+    function showStartHint() {
+        if (startHintSub) {
+            startHintSub.style.visibility = 'visible';
+        }
+    }
+    function showEasterEgg() {
+        if (document.querySelector('.easter-egg-toast')) return;
+        const eggDiv = document.createElement('div');
+        eggDiv.className = 'easter-egg-toast';
+        eggDiv.innerHTML = '我说结束了你尔多龙吗';
+        document.body.appendChild(eggDiv);
+        setTimeout(() => {
+            if (eggDiv && eggDiv.parentNode) eggDiv.remove();
+        }, 5000);
+    }
+    function showEndToast(message = '✨ 故事已经结束，点击重置可重复观看 ✨') {
+        const toast = document.createElement('div');
+        toast.innerText = message;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '30px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = '#2a2f3fe6';
+        toast.style.color = '#ffda99';
+        toast.style.padding = '8px 20px';
+        toast.style.borderRadius = '60px';
+        toast.style.fontSize = '0.85rem';
+        toast.style.backdropFilter = 'blur(8px)';
+        toast.style.zIndex = '999';
+        toast.style.pointerEvents = 'none';
+        toast.style.whiteSpace = 'nowrap';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1500);
+    }
+    function appendStoryLine(htmlContent) {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'dialogue-line';
+        lineDiv.innerHTML = htmlContent;
+        dialogueArea.appendChild(lineDiv);
+        dialogueArea.scrollTop = dialogueArea.scrollHeight;
+        displayedStoryCount++;
+        updateProgress();
+    }
+    function updateProgress() {
+        if (isDisclaimerMode) {
+            progressSpan.innerText = `📜 未开始 / ${TOTAL_STORY_LEN}`;
+        } else {
+            progressSpan.innerText = `📜 ${displayedStoryCount} / ${TOTAL_STORY_LEN}`;
+        }
+    }
+    function renderDisclaimer() {
+        dialogueArea.innerHTML = '';
+        const disclaimerDiv = document.createElement('div');
+        disclaimerDiv.className = 'dialogue-line';
+        disclaimerDiv.innerHTML = SCRIPT[0];
+        dialogueArea.appendChild(disclaimerDiv);
+        const hintDiv = document.createElement('div');
+        hintDiv.className = 'dialogue-line';
+        hintDiv.style.borderLeftColor = '#ffd58c';
+        hintDiv.style.opacity = '0.85';
+        hintDiv.innerHTML = '✨ 点击画面或「点击继续」按钮，将清空本提示并开启完整剧情 ✨';
+        dialogueArea.appendChild(hintDiv);
+        dialogueArea.scrollTop = 0;
+    }
+    function resetGame() {
+        dialogueArea.innerHTML = '';
+        isDisclaimerMode = true;
+        currentStoryIndex = STORY_START_INDEX;
+        displayedStoryCount = 0;
+        postEndClickCount = 0;
+        eggTriggered = false;
+        const existingEgg = document.querySelector('.easter-egg-toast');
+        if (existingEgg) existingEgg.remove();
+        const secondWhisper = document.querySelector('.second-whisper');
+        if (secondWhisper) secondWhisper.remove();
+        renderDisclaimer();
+        advanceBtn.innerText = '▶ 点击开始正文';
+        advanceBtn.style.opacity = '1';
+        updateProgress();
+        showStartHint();
+        dialogueArea.scrollTop = 0;
+        const toasts = document.querySelectorAll('.end-toast-msg');
+        toasts.forEach(t => t.remove());
+        closeSponsorListModal();
+        closeSponsorImageModal();
+    }
+    function startStory() {
+        if (!isDisclaimerMode) return;
+        dialogueArea.innerHTML = '';
+        isDisclaimerMode = false;
+        currentStoryIndex = STORY_START_INDEX;
+        displayedStoryCount = 0;
+        postEndClickCount = 0;
+        eggTriggered = false;
+        advanceBtn.innerText = '▶ 点击继续 · 下一句';
+        advanceBtn.style.opacity = '1';
+        updateProgress();
+        hideStartHint();
+        if (currentStoryIndex < SCRIPT.length) {
+            const firstLine = SCRIPT[currentStoryIndex];
+            appendStoryLine(firstLine);
+            currentStoryIndex++;
+        } else {
+            console.warn("剧本为空");
+        }
+        if (currentStoryIndex >= SCRIPT.length) {
+            advanceBtn.innerText = 'THE END';
+            advanceBtn.style.opacity = '0.7';
+        }
+    }
+    function showNextStoryLine() {
+        if (currentStoryIndex < SCRIPT.length) {
+            const lineHtml = SCRIPT[currentStoryIndex];
+            appendStoryLine(lineHtml);
+            currentStoryIndex++;
+            updateProgress();
+            if (currentStoryIndex >= SCRIPT.length) {
+                advanceBtn.innerText = 'THE END';
+                advanceBtn.style.opacity = '0.7';
+                showEndToast('📖 故事正文完结 · 感谢阅读 📖');
+            } else {
+                advanceBtn.innerText = '▶ 点击继续 · 下一句';
+                advanceBtn.style.opacity = '1';
+            }
+        } else {
+            handlePostEndExtraClick();
+        }
+    }
+    function handlePostEndExtraClick() {
+        postEndClickCount++;
+        if (postEndClickCount === 10 && !eggTriggered) {
+            eggTriggered = true;
+            showEasterEgg();
+            return;
+        }
+        let tipMsg = '📖 故事已经结束，点击重置可重复观看 📖';
+        if (postEndClickCount === 10 && eggTriggered) {
+            tipMsg = '⭐ 故事已经结束，点击重置可重复观看 ⭐';
+        }
+        showEndToast(tipMsg);
+        if (postEndClickCount === 20 && !document.querySelector('.second-whisper')) {
+            const whisper = document.createElement('div');
+            whisper.innerText = '💢还在点？ 你点你妈呢💢';
+            whisper.style.position = 'fixed';
+            whisper.style.bottom = '80px';
+            whisper.style.left = '50%';
+            whisper.style.transform = 'translateX(-50%)';
+            whisper.style.backgroundColor = '#1e1a2fcc';
+            whisper.style.color = '#ffbc6e';
+            whisper.style.padding = '6px 16px';
+            whisper.style.borderRadius = '40px';
+            whisper.style.fontSize = '0.75rem';
+            whisper.style.backdropFilter = 'blur(8px)';
+            whisper.style.zIndex = '998';
+            whisper.style.pointerEvents = 'none';
+            whisper.style.whiteSpace = 'nowrap';
+            whisper.classList.add('second-whisper');
+            document.body.appendChild(whisper);
+            setTimeout(() => whisper.remove(), 2000);
+        }
+    }
+    function handleAdvance(e) {
+        const selection = window.getSelection();
+        if (selection && !selection.isCollapsed) return;
+        if (isDisclaimerMode) {
+            startStory();
+            return;
+        }
+        if (currentStoryIndex < SCRIPT.length) {
+            showNextStoryLine();
+            return;
+        }
+        handlePostEndExtraClick();
+    }
+
+    function convertRubyNodeToPlainText(node) {
+        const blockTags = new Set(['P', 'DIV', 'SECTION', 'ARTICLE', 'LI', 'BLOCKQUOTE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BR']);
+        function getEffectiveText(nodePart, isBlockContext = false) {
+            if (nodePart.nodeType === Node.TEXT_NODE) return nodePart.textContent;
+            if (nodePart.nodeType === Node.ELEMENT_NODE) {
+                const tagName = nodePart.tagName.toUpperCase();
+                if (tagName === 'RUBY') {
+                    let displayText = '';
+                    let rubyText = '';
+                    for (const child of nodePart.childNodes) {
+                        if (child.nodeType === Node.TEXT_NODE) displayText += child.textContent;
+                        else if (child.nodeType === Node.ELEMENT_NODE) {
+                            if (child.tagName.toUpperCase() === 'RT') rubyText += child.textContent;
+                            else displayText += getEffectiveText(child, false);
+                        }
+                    }
+                    if (rubyText.trim() !== '') return `${displayText}（${rubyText}）`;
+                    else return displayText;
+                }
+                if (tagName === 'BR') return '\n';
+                let prefix = '', suffix = '';
+                if (blockTags.has(tagName)) { prefix = '\n'; suffix = '\n'; }
+                let innerText = '';
+                for (const child of nodePart.childNodes) innerText += getEffectiveText(child, blockTags.has(tagName));
+                return prefix + innerText + suffix;
+            }
+            return '';
+        }
+        return getEffectiveText(node);
+    }
+    function onCopyHandler(e) {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
+        const range = selection.getRangeAt(0);
+        const clonedFragment = range.cloneContents();
+        let convertedPlainText = '';
+        for (let node of clonedFragment.childNodes) convertedPlainText += convertRubyNodeToPlainText(node);
+        convertedPlainText = convertedPlainText.replace(/^\n+/, '').replace(/\n+$/, '\n');
+        const serializer = new XMLSerializer();
+        let originalHtml = '';
+        for (let node of clonedFragment.childNodes) originalHtml += serializer.serializeToString(node);
+        e.preventDefault();
+        e.clipboardData.setData('text/plain', convertedPlainText);
+        e.clipboardData.setData('text/html', originalHtml);
+    }
+
+    document.addEventListener('copy', onCopyHandler);
+    advanceBtn.addEventListener('click', (e) => { e.stopPropagation(); handleAdvance(e); });
+    gameContainer.addEventListener('click', (e) => {
+        if (e.target === resetBtn || e.target.closest?.('.reset-btn') || e.target === advanceBtn || e.target.closest?.('#clickAdvanceBtn') || e.target.closest?.('#sponsorListBtn')) return;
+        handleAdvance(e);
+    });
+    resetBtn.addEventListener('click', (e) => { e.stopPropagation(); resetGame(); });
+    
+    sponsorListBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSponsorListModal();
+    });
+    closeSponsorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSponsorListModal();
+    });
+    openSponsorImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSponsorImageModalFn();
+    });
+    closeImageModalBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSponsorImageModal();
+    });
+    sponsorModal.addEventListener('click', (e) => {
+        if (e.target === sponsorModal) closeSponsorListModal();
+    });
+    sponsorImageModal.addEventListener('click', (e) => {
+        if (e.target === sponsorImageModal) closeSponsorImageModal();
+    });
+
+    resetGame();
+    renderSponsorList();
+    console.log('你看你妈呢');
+</script>
+</body>
+</html>

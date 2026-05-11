@@ -1,4 +1,4 @@
-# hajimekita
+# HajimeKita
 
 A mini game I wrote when I was feeling bored
 There might be many bugs. If so, please feel free to raise them in the comment section

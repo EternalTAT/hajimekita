@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>你看什么看？</title>
+    <title>创北GAL GAME（九霄线已一半实装）</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,7 @@
 
         .game-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 950px;
             background: rgba(20, 25, 40, 0.65);
             backdrop-filter: blur(8px);
             border-radius: 48px;
@@ -67,7 +67,32 @@
             padding-top: 6px;
             display: inline-block;
             color: #f0e2c5;
-            transition: visibility 0.1s ease;
+        }
+
+        .affection-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 20px;
+            border-radius: 40px;
+            margin: 8px 16px 0 16px;
+            backdrop-filter: blur(4px);
+            font-size: 0.85rem;
+            font-weight: bold;
+            flex-wrap: wrap;
+        }
+        .affection-item {
+            color: #FFE6B0;
+            letter-spacing: 1px;
+        }
+        .affection-item span {
+            color: #ffaa66;
+            font-weight: bold;
+            margin-left: 6px;
+            background: #1e1a2f;
+            padding: 2px 8px;
+            border-radius: 40px;
         }
 
         .dialogue-area {
@@ -115,20 +140,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        ruby {
-            ruby-align: center;
-        }
-        rt {
-            font-size: 0.7rem;
-            color: #ffe0a3;
-            letter-spacing: 0.5px;
-            font-weight: normal;
-            text-shadow: none;
-            background: rgba(0,0,0,0.4);
-            padding: 0 2px;
-            border-radius: 6px;
         }
 
         .action-bar {
@@ -217,6 +228,70 @@
             cursor: text;
         }
 
+        .option-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .option-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .option-card {
+            background: linear-gradient(145deg, #1f253e, #141a2c);
+            border-radius: 48px;
+            padding: 30px 32px;
+            max-width: 500px;
+            width: 85vw;
+            border: 1px solid rgba(255,200,100,0.6);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            text-align: center;
+        }
+        .option-card h3 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        .option-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .option-btn {
+            background: #2e3440;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #FFE6B0;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            border: 1px solid #ffb34788;
+        }
+        .option-btn:hover {
+            background: #ffb347;
+            color: #1e1b1a;
+            transform: scale(0.98);
+            border-color: #fff0c0;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -241,31 +316,12 @@
             background: rgba(25, 30, 45, 0.95);
             border-radius: 48px;
             max-width: 85vw;
-            width: 500px;
+            width: 550px;
             border: 1px solid rgba(255, 200, 100, 0.5);
             box-shadow: 0 30px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,240,0.1);
             padding: 30px 28px;
             text-align: center;
             backdrop-filter: blur(4px);
-            animation: floatIn 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: scale(0.92) translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-        .modal-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.2rem;
-            background: linear-gradient(135deg, #FFE6B0, #FFB347);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
         }
         .sponsor-list {
             margin: 20px 0;
@@ -281,14 +337,6 @@
             font-size: 1rem;
             padding: 8px 0;
             border-bottom: 1px dashed rgba(255,200,100,0.3);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .sponsor-list p:before {
-            content: "⭐";
-            font-size: 1.1rem;
         }
         .modal-buttons {
             display: flex;
@@ -305,7 +353,6 @@
             font-weight: bold;
             color: #ffeaC5;
             cursor: pointer;
-            transition: 0.2s;
             font-family: inherit;
             font-size: 0.9rem;
             border: 1px solid #ffb347;
@@ -315,35 +362,14 @@
             color: #1e1b1a;
             border: none;
         }
-        .modal-btn-primary:hover {
-            background: #ffa01e;
-            transform: scale(0.97);
-        }
-        .modal-btn:hover {
-            background: #5f4a44;
-            transform: translateY(-2px);
-        }
-        .image-modal-content {
-            text-align: center;
-        }
         .sponsor-img {
             max-width: 100%;
+            max-height: 300px;
             border-radius: 32px;
-            margin: 16px 0;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            border: 2px solid #ffd58c;
+            margin: 15px 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            border: 1px solid #ffcc88;
         }
-        .close-img-btn {
-            margin-top: 12px;
-            background: #2a2f3f;
-            border: 1px solid #ffaa55;
-        }
-        .sponsor-note {
-            font-size: 0.75rem;
-            color: #c9bb9b;
-            margin-top: 8px;
-        }
-
         .easter-egg-toast {
             position: fixed;
             top: 50%;
@@ -358,82 +384,58 @@
             text-align: center;
             white-space: nowrap;
             z-index: 10000;
-            box-shadow: 0 0 0 4px rgba(255,215,0,0.6), 0 20px 35px rgba(0,0,0,0.4);
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.6);
             backdrop-filter: blur(8px);
             font-family: monospace;
-            letter-spacing: 2px;
-            border: 1px solid #fff4c2;
             animation: eggPop 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), eggFade 3s ease forwards;
             pointer-events: none;
-            text-shadow: 0 1px 2px rgba(255,255,200,0.8);
         }
-
         @keyframes eggPop {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.6);
-            }
-            70% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.08);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
-
         @keyframes eggFade {
             0% { opacity: 1; visibility: visible; }
             80% { opacity: 1; }
             100% { opacity: 0; visibility: hidden; }
         }
-
+        .ending-card {
+            background: rgba(0,0,0,0.8);
+            border-radius: 40px;
+            padding: 28px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #ffb347;
+            animation: fadeSlideUp 0.6s ease;
+        }
+        .ending-title {
+            font-size: 2rem;
+            color: #ffd966;
+            margin-bottom: 16px;
+        }
         @media (max-width: 640px) {
-            .dialogue-area {
-                padding: 20px 16px;
-                max-height: 420px;
-            }
-            .dialogue-line {
-                font-size: 1rem;
-                padding-left: 12px;
-            }
-            .action-bar {
-                padding: 12px 20px 24px 20px;
-            }
-            .click-hint, .reset-btn, .sponsor-btn {
-                padding: 6px 16px;
-                font-size: 0.8rem;
-            }
-            .modal-card {
-                width: 90vw;
-                padding: 20px;
-            }
-            .easter-egg-toast {
-                font-size: 1rem;
-                padding: 14px 24px;
-                white-space: normal;
-                width: 80%;
-                text-align: center;
-            }
+            .dialogue-line { font-size: 1rem; }
+            .option-btn { font-size: 0.9rem; }
         }
     </style>
 </head>
-
 <body>
 <div class="game-container" id="gameContainer">
     <div class="game-bg-decoration">
         <div class="game-title-main">创北GAL GAME欠费版</div>
         <div class="game-title-sub" id="startHintSub">⚡ 点击任意处开始正文 ⚡</div>
     </div>
-    <div class="game-bg-decoration" style="border-bottom: none; padding:0; background:transparent;"></div>
+    <div class="affection-bar" id="affectionBar">
+        <div class="affection-item">❤️ 九霄好感: <span id="affJX">0</span></div>
+        <div class="affection-item">🌿 孜然好感: <span id="affZR">0</span></div>
+        <div class="affection-item">✏️ 句号好感: <span id="affJH">0</span></div>
+    </div>
     <div class="dialogue-area" id="dialogueArea"></div>
     <div class="action-bar">
-        <div class="progress-indicator" id="progressText">📜 0 / 0</div>
+        <div class="progress-indicator" id="progressText">📜 序章</div>
         <div class="advance-area">
-            <div class="click-hint" id="clickAdvanceBtn">
-                ▶ 点击继续 · 下一句
-            </div>
+            <div class="click-hint" id="clickAdvanceBtn">▶ 点击继续 · 下一句</div>
         </div>
         <div style="display: flex; gap: 12px;">
             <button class="reset-btn" id="resetBtn">⟳ 重新开始</button>
@@ -442,22 +444,30 @@
     </div>
 </div>
 
+<div id="optionModal" class="option-overlay">
+    <div class="option-card">
+        <h3>✨ 内心抉择 ✨</h3>
+        <div id="optionText" style="color:#f0e2c5; margin-bottom: 20px;">你的选择将牵动命运的丝线...</div>
+        <div id="optionButtonsContainer" class="option-buttons"></div>
+    </div>
+</div>
+
 <div id="sponsorModal" class="modal-overlay">
     <div class="modal-card">
         <h3>✨ 赞助本项目的人 ✨</h3>
-        <div class="sponsor-list" id="sponsorListContainer">
-        </div>
+        <div class="sponsor-list" id="sponsorListContainer"></div>
         <div class="modal-buttons">
             <button class="modal-btn" id="closeSponsorModalBtn">🏠 回到主界面</button>
             <button class="modal-btn modal-btn-primary" id="openSponsorImageBtn">🎁 打开赞助界面</button>
         </div>
-        <div class="sponsor-note">感谢每一位热心的朋友，因为有你们故事延续</div>
+        <div class="sponsor-note">感谢每一位热心的朋友</div>
     </div>
 </div>
+
 <div id="sponsorImageModal" class="modal-overlay">
     <div class="modal-card image-modal-content">
         <h3>❤️ 赞助支持展台 ❤️</h3>
-        <img id="sponsorDisplayImg" class="sponsor-img" src="thanks.jpg" alt="赞助感谢图">
+        <img id="sponsorDisplayImg" class="sponsor-img" src="thanks.jpg" alt="赞助感谢图" onerror="this.style.display='none'">
         <div class="modal-buttons">
             <button class="modal-btn close-img-only" id="closeImageModalBtn">🔙 关闭赞助界面</button>
         </div>
@@ -466,416 +476,662 @@
 </div>
 
 <script>
-    // ======================= 剧本 ========================
+    // ======================= 剧本（包含完整主线，选项触发点）======================
     const SCRIPT = [
-            "观前提示：<br>本作中所有角色均已成年，并且无任何不良暗示，请注意甄别。剧情中的所有文本均可直接复制。<br>因为写代码的那个人懒，没有测试手机端阅读功能是否正常，因此出现了bug可以直接去私信说明。<br><br>特别鸣谢：<br>（目前还没想好写谁）",
+            "观前提示：<br>本作中所有角色均已成年，并且无任何不良暗示，请注意甄别。剧情中的所有文本均可直接复制。<br>因为写代码的那个人懒，没有测试手机端阅读功能是否正常，因此出现了bug可以直接去私信说明。<br>已经将选项系统给做好了，但是因为其他线路一个字都还没写，所以目前一个选项都没有，只能默认进入九霄线，同时也是因为还缺少了相当大一堆的文本的原因导致了衔接可能有点问题，等我慢慢补吧。<br>特别鸣谢：<br>（目前还没想好写谁）",
             "如果你能够看到这串按理来说看不到的文字，那就说明你偷看我的源代码了。",
 
-            "天空像是被谁撕开了一道口子，雷声从裂缝里滚落下来，轰隆隆地砸在窗玻璃上。",
-            "整栋老旧的公寓楼都跟着颤了颤，九霄蜷在沙发上的身子微微一抖。",
-            "身后传来轻微的脚步声声，然后是一双手臂温柔地拢过来。",
-            "北笙的胸膛贴上她的后背，温热的手掌覆上她耳尖，刚好把下一声炸雷隔绝在外。",
-            "「别怕，我在呢。」",
-            "他的声音很低。",
-            "但是却比窗外任何一记响雷都更有分量。",
-            "九霄顺势靠进那个熟悉的怀抱，雷声远了，模糊了，变成背景里闷闷的喘息。取而代之的，是背后一下一下有力的心跳，沉稳得像在替这个世界打着节拍。",
-            "她把脸埋进他胸口，声音闷闷的，软得像化开的糖。",
-            "「你也只有这种时候才像是我的哥哥了。」",
-            "北笙低头看她。从这个角度只能看见她微微翘起的发旋，和她不自觉地变红的耳廓。",
-            "他没来由地觉得嗓子有点紧，手臂不自觉地收紧了些。",
-            "「但我们现在是恋人不是吗？」",
-            "这话一出口，怀里的人明显僵了一瞬。",
-            "九霄耳尖上的粉色迅速蔓延到脸颊。",
-            "她轻轻挣了一下，当然没挣开，于是声音里带上了几分恼羞成软的意味。",
-            "顿了顿，又小声补了一句，像是自言自语，又像是在说服自己。",
-            "「嘛，虽然我们之间没有血缘关系，但是我姑且还是会把你当哥哥来看待的。」",
-            "北笙没接话。他知道她还有下文。",
-            "果然，沉默了几秒，九霄的声音更小了，小到几乎要被窗外的雨声吞没。",
-            "「毕竟要不是为了供你这个无能的哥哥上大学，我才不会那么拼去当偶像呢……」",
-            "北笙嘴角弯起来，下巴抵在她柔软的发顶上。洗发水的味道淡淡的，混着窗外雨水的气息。",
-            "「是是是，多亏了九霄大人。」",
-            "他的声音里有种藏不住的笑意，更多的却是某种说不清的心疼。",
-            "「那，这位大明星，能不能让哥哥再多抱一会儿？」",
-            "九霄没有回答。",
-            "但北笙却能够感受到，垂在他身侧的手指悄悄攥紧了他的衣角。",
-            "窗外雷声渐远，雨还淅淅沥沥地下着。",
-            "老旧公寓的客厅里，两个人安静地抱着，谁也没有再说话。",
-            "（场景转换）",
-            "第二天清晨，阳光从窗帘缝隙偷偷溜进来，在地板上画出一条细细的金线。",
-            "九霄先醒了。",
-            "她侧过脸，看着身边还在睡梦中的北笙。",
-            "睡着的时候他看起来比平时还要年轻，眉目舒展着，唇边似乎还挂着一点若有若无的笑。她忍不住伸出手指，轻轻戳了戳他的脸颊。",
-            "软软的。",
-            "她无声地笑起来，轻手轻脚地掀开被子下了床，赤着脚踩在冰凉的地板上，整个人轻快得像只猫。",
-            "围裙系在腰上的动作行云流水。煎蛋在平底锅里滋滋地响着，边缘微微焦黄，她熟练地翻了个面，顺手把牛奶倒进锅里温着。",
-            "她一边哼着自己新单曲的旋律，一边继续做着早餐，哼到副歌部分的时候记起来是首情歌，耳根又悄悄地红了。",
-            "「哥哥，起床啦。」",
-            "她回到床边，俯下身子，声音温柔地说。顺手把被子往下拉了拉，露出北笙睡得乱糟糟的头发。",
-            "北笙迷迷糊糊地睁开眼，阳光逆着九霄的身影洒下来，她整个人都被镀上了一层淡淡的光。他眨了眨眼，恍惚间觉得这辈子大概就是为了每天早上的这个瞬间。",
-            "早餐很安静。",
-            "九霄用叉子戳着煎蛋，蛋黄液慢慢淌出来，她也不急着吃，眼神时不时地飘向对面正埋头吃着的北笙，嘴角的弧度怎么都压不下去。",
-            "北笙自然注意到了，但没有戳穿她。",
-            "吃完早餐后，两人准备去上学了。",
-            "九霄站在玄关，手扶着鞋柜，左脚已经踩上了小皮鞋，却突然不动了。",
-            "她扯住北笙的袖子，仰起头。晨光里她的眼睛亮得像蓄了一汪水，声音又软又黏，像在撒娇又像在理所当然地讨要着什么。",
-            "「哥哥，人家想要那个嘛。」",
-            "北笙系鞋带的手顿了一下。",
-            "「哪个？」",
-            "九霄的脸上浮起一层薄红，却没有移开视线，眼睛亮晶晶地盯着他，像是在盯着一颗很想吃到的糖果。",
-            "北笙心里清楚得很，但还是忍不住想逗她。他嘴角微微上扬，明知故问。",
-            "「你不说出来我怎么知道？」",
-            "九霄的脚轻轻跺了一下地板。",
-            "但是北笙还是装作一副什么都不知道的样子看着她。",
-            "「就是……<ruby>mua<rt>亲亲</rt></ruby>啦！」",
-            "她几乎是喊出来的，尾音却在一半的地方软了下去。脸红得像要烧起来，却还要嘴硬般地瞪着北笙。",
-            "「为什么非要人家说出来啊，哥哥坏！」",
-            "北笙终于没忍住笑出了声。他弯下腰，一只手扶住她的肩膀，在她额头上轻轻印下一个吻。然后顿了顿，又飞快地偏过头，在她嘴角处落下了第二个。",
-            "九霄的耳朵红透了。但她却并没有躲,同时用手偷偷地摸了一下北笙的口袋。",
-            "「这还差不多嘛……」",
-            "她小声嘟囔着，声音闷在围巾里，但眼睛里的光怎么都藏不住。",
-            "两个人磨蹭了半天，终于出了门。",
-            "楼道里北笙推着他那辆破旧的自行车，链条发出咔嗒咔嗒的声响。",
-            "九霄走在他身后，踩着他的影子，两个人在狭窄的楼梯间一前一后地往下走。",
-            "出了小区门口，一个向左，一个向右，往同一个城市的不同方向。",
-            "北笙骑着自行车往XX大学赶。那是一所说不上好也说不上坏的学校，跟他的成绩一样，平平无奇，普普通通。",
-            "春风灌进他的校服袖子，鼓鼓囊囊的，他一只手扶着车把，另一只手无意识地在口袋里摸了摸。",
-            "那里有早晨九霄悄悄塞进去的一颗奶糖。",
-            "九霄要坐地铁去YY中学。那是全市数一数二的重点中学，她穿着校服裙站在站台上，旁边的大叔认出了她，激动地掏出手机拍照。",
-            "她条件反射般地露出标准的偶像微笑，心里却在想她的哥哥现在走到哪里了，会不会迟到。",
-            "今天实在踩不上点了。",
-            "北笙和九霄两人几乎同时如此想到。",
-            "九霄几乎是贴着上课铃冲进教室的。她气喘吁吁地站在门口，胸口还在剧烈起伏，额前的碎发被汗粘在皮肤上。",
-            "班主任推了推眼镜，镜片反了一下光。",
-            "「九霄同学，你又迟到了。」",
-            "她的声音不大，但教室里安静得能听见窗外操场上体育课的哨声。",
-            "「虽然你是偶像，但学校有学校的规定。」",
-            "九霄低下头，刘海遮住了大半张脸。班主任以为她在反省，其实她的嘴角正偷偷地翘起来。然后她在心里把哥哥骂了三遍——不对，是四遍。",
-            "而北笙在大学那边也好不到哪里去。",
-            "阶梯教室里教授已经开始点名，他猫着腰从后门溜进来，书包带子从肩膀上滑下去，手忙脚乱地去接，发出不小的动静。室友回过头来嘲笑他。",
-            "「又、迟、到、啊、臭、妹、控。」",
-            "北笙瞪了他一眼，在旁边的座位上坐下来，翻开课本才发现拿错了。",
-            "早上出门太急，他拿的是九霄的笔记本。",
-            "翻开第一页，是她工工整整的字迹：「笨蛋哥哥专用记事本。」，旁边还画了个气鼓鼓的小人。",
-            "他的手指在那一行字上停了一会儿，然后慢慢弯起嘴角。",
-            "窗外，五月初的风轻轻吹过，吹动了两扇不同方向窗户的窗帘。这个城市的东边和西边，两个正在上课的人，在同一秒不约而同地抬起头看了一眼窗外。",
-            "然后又在同一秒，不约而同地想——",
-            "明天，明天一定早点出门。"
+            "北笙觉得自己的人生大概就是一碗放凉了的白粥。<br>温吞、寡淡，毫无惊喜。",
+            "此刻他正坐在大学教室的最后一排，百无聊赖地转着笔。<br>讲台上老教授的声音忽远忽近，像一台信号不好的收音机。<br>他说的每个字他都听得懂，但是一旦连起来就死活听不懂了。",
+            "窗外阳光正好，照在他那张扔进人堆里绝对找不出来的脸上。<br>不算帅也不算丑，不算高也不算矮，成绩不算好也不算差，整个人生就是一部名为《普通》的纪录片。",
+            "他的手机震了一下。",
+            "他低头扫了一眼屏幕，嘴角抽了抽。",
+            "备注名赫然写着“祖宗”。<br>这是他自己改的，虽然每次被发现都会被改回“哥哥”，但他还是会趁她不注意再改回去。",
+            "消息就一句话：“哥，今晚我煮了汤。回来喝。”",
+            "北笙盯着屏幕沉默了三秒，然后默默往窗外看了一眼。太阳确实是打西边落下去的，没有从东边升起来",
+            "北笙低头准备给“祖宗”回消息。",
+            "「又在看你那个妹妹的消息？」",
+            "旁边传来一个凉飕飕的声音。",
+            "北笙不用扭头都知道是谁。",
+            "奇末，他同班同学，坐他隔壁，一张嘴被老天爷开过光——专克一切矫情和妄想。",
+            "「你知道吗？你每次看你妹的消息都像一个中了彩票但不知道去哪兑奖的傻子，」",
+            "奇末推了推眼镜，语气平淡得像在念课文。",
+            "「不过也合理，你上辈子大概率是捐了一座庙，不然解释不了为什么你这种人能有个顶流妹妹。」",
+            "「你就不能说点好听的。」",
+            "「实话都不好听。」",
+            "这话倒是真的。奇末这人嘴毒，但毒的都是实话。",
+            "上个月北笙交了一篇作业，自己觉得写得还行，奇末看了三秒就觉得不行，然后花了两个小时帮他重新整理了框架。",
+            "期末成绩出来，那门课北笙拿了A。<br>奇末知道了之后只回了一句「还行，说明你不是完全没救，只是九成没救。」",
+            "北笙有时候觉得奇末是老天爷派来磨练他心态的。",
+            "他正要回消息，余光瞥见一个女生正抱着手机疯狂打字，嘴角扬起的弧度让北笙本能地觉得不太妙。",
+            "是句号，同样是他的同班同学。<br>平时安安静静坐在那里，看着就是个乖巧文静的好学生。",
+            "但你只要走近一看就会发现，她手机屏幕上赫然是两个二次元美少年深情对视的画面。",
+            "「你在看什么?」",
+            "「“没什么呀。」",
+            "句号抬起头，笑容纯洁得像个天使。",
+            "北笙太了解这种眼神了。",
+            "上次她露出这个眼神之后，第二天某个同好群里就多了一篇热度爆表的同人文。<br>虽然名字用的都是化名，但北笙怎么看怎么觉得那个“普通男大学生vs当红偶像妹妹”的设定多少有点吻合了。",
+            "他默默把椅子往远离句号的方向挪了二十厘米。",
+            "句号注意到了这个动作，微微一笑，把椅子往他那边挪了二十厘米。",
+            "北笙放弃挣扎，低头回消息：“好。汤里别放香菜。”",
+            "对面秒回了一个小猫点头的表情包。",
+            "北笙看着那个可可爱爱的头像，想了半天，还是没想明白舞台上光芒万丈的那个人，和在他家厨房里笨手笨脚切菜的妹妹，到底哪个才是真的。",
+            "可能两个都是。<br>也可能对他来说，后面那个更真一点。",
+            "与此同时，城市的另一端。",
+            "放学铃响过十分钟了，教室里人走得七七八八。九霄坐在座位上，低头看着手机屏幕上的那个“好”字，嘴角弯了一下。",
+            "就一下。然后她飞快地收起了表情，把手机塞进校服口袋，开始收拾书包。",
+            "「九霄同学。」",
+            "后桌传来的声音明亮又爽朗，带着一点少年人特有的朝气。",
+            "一个男孩单手托腮，歪着头看她，笑得像窗外的夕阳一样灿烂。<br>任何人看到这个笑容，都会觉得这大概就是“阳光开朗大男孩”这个形容词的完美样本。",
+            "「你看上去好像今天心情很好的样子哦，有什么好事吗？」",
+            "九霄头也没回，语气平淡得像在对空气说话。",
+            "「没什么。」",
+            "「是吗。」",
+            "长夜的笑容没变，目光却从九霄的后颈一寸一寸地滑过，最后落在她塞手机的那个校服口袋上。",
+            "「九霄同学今天走得好早。平时不是都要多留一会儿吗？今天社团不排练？」",
+            "「不排。有事。」",
+            "「什么事呀？这么着急。」",
+            "长夜的嘴角又弯了弯，手指无意识地摩挲着笔杆。",
+            "他的眼睛在笑，但眼底深处有什么东西不太对劲。像是表面平静的湖面底下沉着某种黑色的、缓慢涌动的东西，被一层薄薄的笑意勉强盖住了。",
+            "「回家做饭。」",
+            "「做饭？你还会做饭？看不出来。给谁做？」",
+            "他的语调很温柔，但那个背对着他的少女却微微皱了皱眉，脚步没有丝毫停顿，径直走向门口。",
+            "「那明天见咯，九霄同学。」",
+            "长夜目送她的背影消失在门口，笑容纹丝不动地挂在脸上。",
+            "然后他慢慢收回目光，落在自己摊开的课本上。",
+            "那一页被圆珠笔画满了什么东西，仔细看的话，像是某种反复描摹的线条，缠绕在一起，看不清到底是什么形状。",
+            "「回家做饭……」",
+            "他轻声重复了一遍这几个字，声音低得几乎只有自己能听见。",
+            "「也不知道是给谁做。」。",
+            "旁边忽然传来一声不冷不热的回答",
+            "「反正不是你。」",
+            "长夜转过头。他的同桌正低着头翻一本练习册，表情淡漠得像刚才那句话不是从她嘴里说出来的一样。",
+            "「孜然同学，」",
+            "长夜的笑容重新活了过来，语气又恢复成那种阳光开朗的调子。",
+            "「你今天怎么也不走？」",
+            "「写作业。」",
+            "「在教室写作业？」",
+            "长夜往她那边凑了凑，看了一眼练习册的封面。",
+            "「这本不是上周就交了吗？」",
+            "孜然翻页的动作停了零点几秒，然后她面不改色地又翻了一页。",
+            "「记错了。」",
+            "「你也会记错？你不是那种把每科作业截止时间精确到分钟的——」",
+            "孜然合上了练习册。声音不大，但很干脆。她转过头，正面对上长夜的目光，精致的脸上没有任何多余的表情。",
+            "「你话很多欸。」",
+            "长夜举起双手做了个投降的姿势。",
+            "「好好好，我闭嘴。」",
+            "孜然又看了他两秒，确认他真的不再说话了，才转回去。<br>教室里安静下来，只剩下窗外操场上隐约传来的体育部喊口号的声音。",
+            "孜然没有重新翻开练习册。她把它塞进了书包，然后维持着面朝桌面的姿势，一动不动地坐了几秒。",
+            "她的耳朵在听——听旁边的动静。<br>长夜的笔在纸上划过，沙沙响，频率很慢，不像是真的在写什么东西。<br>前座的男生在打游戏，后排的女生们在聊某个男团的回归日期。没有人注意这个角落。",
+            "孜然不动声色地把手伸进书包夹层，摸到一个圆柱形的小东西。",
+            "她攥在手心里，确认周围没有人看过来，然后低头，快速剥开糖纸，把棒棒糖塞进嘴里。动作行云流水，快到像是某种刻进肌肉记忆里的条件反射。",
+            "甜的。草莓味的。",
+            "但是她的脸上依旧没有表情，嘴闭着，棒棒糖在口腔里安静地转动，从左边换到右边，脸颊鼓起一个不太明显的小包。",
+            "在外人看来，她还是那副生人勿近的样子，脊背挺直，目光冷清，像一只蹲在墙头睥睨众生的猫。",
+            "「孜然同学。」",
+            "长夜的声音忽然在旁边响起来。",
+            "孜然整个人僵了一瞬，嘴里的棒棒糖也停住了。",
+            "……干嘛。",
+            "她没有转头，声音闷闷的，因为嘴里含着东西。",
+            "长夜托着腮，歪头看她，目光里带着一种探究的意味。",
+            "「你有没有闻到一股草莓味？」",
+            "「没有。」",
+            "棒棒糖还含在嘴里，说话的时候舌头有点打结，但她硬是把这两个字说得冷冰冰的，像在陈述一个与己无关的客观事实。",
+            "长夜的视线慢慢向她那边移动，最后落在她微微鼓起的左边脸颊上。那个弧度很小，如果不是坐在同桌这个距离，根本注意不到。",
+            "他盯着那个鼓包看了两秒。",
+            "孜然察觉到了他的视线。她的耳朵尖开始以一种不可控的速度变红，从耳垂一路蔓延到耳廓，像是被人用红色的水彩一笔一笔地晕染上去。<br>但她的脸上依旧维持着零下五度的表情，眼神甚至比刚才更冷了，冷到如果眼神能结冰，长夜现在大概已经被冻在了课桌上。",
+            "一个脸颊鼓着小包、耳朵通红的少女，用能杀人的眼神冷冷地瞪着你。",
+            "这个画面的冲击力让长夜沉默了整整三秒。",
+            "「……你耳朵红了。」",
+            "「没有。」",
+            "「两只都红了。」",
+            "「你看错了。」",
+            "长夜看着她。她的右手还攥着刚才剥下来的糖纸，手指收紧，把那张彩色塑料纸捏成了一个小小的球，塞进了校服袖子里。<br>动作极其自然，自然到如果长夜不是一直在看她，根本不会发现。",
+            "「孜然同学，你是不是……在吃糖。」",
+            "孜然沉默了片刻。然后她把刚吃完的棒棒糖从嘴里拿了出来。",
+            "动作很慢，很镇定，像是在做一个完全正常、毫无破绽的事情。她捏着那根白色的小棍子，面无表情地看着长夜，像是在说“你有什么问题吗”。",
+            "「教室里不让吃糖。」",
+            "「我知道，所以我希望你不要说出去。」",
+            "长夜靠在椅背上，看着她。",
+            "夕阳从窗外斜斜地照进来，把孜然半边脸笼在暖橘色的光里。",
+            "她的侧脸线条偏冷，下颌收得很利落，睫毛垂下来的时候显得格外疏离。",
+            "孜然忽然转过头，对上他的视线。她的表情已经恢复到了出厂设置的冷淡模式，嘴里的糖也吃完了，只剩一根光秃秃的白色小棍子被她捏在指尖。",
+            "「你在看什么。」",
+            "「“没什么。就是觉得孜然同学……跟我想的有点不太一样。」",
+            "孜然把棒棒糖棍子用纸巾包好，放进书包侧袋里。动作一丝不苟，像是在处理什么机密文件。然后她站起来，把书包甩到肩上，低头看着还坐在座位上的长夜。",
+            "「你也跟我想的不太一样。」",
+            "「哪里不一样？」",
+            "「你笑起来的时候，眼睛从来不笑。挺吓人的。」",
+            "说完她转身走了。",
+            "走了两步，又停下来。她没有回头，声音比刚才轻了半个调，像是犹豫了一下才说出口的。",
+            "明天数学作业是第三章的练习卷，你最好提前写。",
+            "她快步走出了教室，背影依旧是那副冷淡又疏离的模样，脊背挺得笔直，步伐干脆利落，像是刚才那个偷偷吃草莓糖、耳朵红到滴血的人跟她毫无关系。",
+            "然后走廊里传来一阵急促的脚步声，脚步声里夹杂着一个女生低低的嘟囔。",
+            "「完了完了刚才是不是被看到了……算了看到就看到，反正他应该不会说出去。」",
+            "脚步声渐渐远了。",
+            "教室里，长夜一个人坐在原位，维持着仰头的姿势没动。过了很久，他忽然低下头，用手背挡住嘴角。肩膀抖了两下，没有发出声音。",
+            "............",
+            "北笙到家的时候，天已经黑透了。",
+            "他掏出钥匙拧开门的瞬间，一股浓郁的骨头汤香味就从门缝里涌了出来，暖烘烘地扑了他满脸。",
+            "玄关的灯开着，鞋柜旁边整整齐齐地摆着一双白色的运动鞋，不是什么限量款，就是街边店里随便买的那种，刷得很干净，鞋带系成了对称的蝴蝶结。",
+            "厨房里有动静。锅铲碰到锅沿的声响，灶火的呼呼声，还有一个人哼歌的声音。调子很轻，断断续续的，像是哼的人自己都没意识到自己在哼。",
+            "北笙换了拖鞋走进去，靠在厨房门框上。",
+            "厨房里的那个人背对着他，扎着一个松垮垮的马尾，穿着一件明显大了两号的卫衣。",
+            "北笙眯起眼睛辨认了一下，嗯，是他的。卫衣袖子卷了好几道，露出两截白细的手腕，正握着汤勺在锅里搅。",
+            "灶台边上放着一部手机，屏幕还亮着，上面是他半小时前发的那条消息。",
+            "北笙看着那个背影，脑子里不由自主地浮现出另一个画面。",
+            "今天下午在公交站等车的时候，他身后那块巨大的LED广告屏上，正好在轮播一个彩妆广告。",
+            "画面里的少女画着精致的舞台妆，眼尾挑着一抹凌厉的红色，眼神冷淡疏离，像是隔着屏幕睥睨所有人。",
+            "当时北笙站在那块屏幕下面啃着一根烤肠，旁边的几个高中生模样的学生正仰着头激动地拍屏幕，嘴里喊着「九霄好美」「九霄妈妈踩我」「这个女人为什么这么可爱」之类的话。",
+            "而这个刚刚被别人这么称赞的女人，此刻正穿着他的卫衣，在他家厨房里用勺子舀了一小口汤，小心翼翼送到嘴边尝了一口，然后被烫得嘶了一声，对着汤锅皱起了眉头，自言自语。",
+            "北笙没忍住，笑了一声。",
+            "九霄猛地转过头来。",
+            "她脸上没化妆，素着一张脸，眉毛淡淡的，嘴唇因为刚才被烫了一下微微发红。",
+            "头发也有点乱，几缕碎发贴在脸颊上，整个人看起来跟下午广告屏上那个锋芒毕露的偶像完全是两个物种。",
+            "她看到门口的北笙，先是一愣，然后表情迅速从“煮饭模式”切换成了一副有点嫌弃的样子。",
+            "「站那干嘛，进来盛饭。」",
+            "语气平淡，理所当然，像是在使唤一个不怎么好用的家用电器。",
+            "北笙走进厨房，从消毒柜里拿出两只碗，随口问了一句。",
+            "「今天怎么这么早回来？没排练？」",
+            "「今天没有。本来经纪人想临时加一个杂志采访，我说已经到家了，她就没再说什么。」",
+            "北笙接过她递来的汤碗，多看了她一眼。",
+            "他大概能想象那个画面。",
+            "经纪人打电话过来，说有个什么临时机会，九霄接起电话，背景音是菜市场大妈吆喝“排骨便宜两块钱”的声音。然后她冷静地告诉对方“已经到家了”，说完挂了电话，继续低头挑带脆骨的排骨。",
+            "这事她不是第一次干。",
+            "上次周末有个品牌的快闪活动，经纪人打电话来的时候九霄正在家里研究怎么发面蒸包子，两只手全是面粉，用肩膀夹着手机听完，说了句“今天真的不行”，然后挂了电话继续揉面。",
+            "第二天那个活动上了热搜，粉丝们都在猜九霄为什么缺席，有人说是身体不舒服，有人说是档期冲突，还有人做了长篇大论的行程分析。而真正的原因只是她想在家把包子蒸完。<br>这个世界上大概只有北笙一个人知道。",
+            "「你那经纪人没被你气死也是命大。」",
+            "「我又不是没干完本职工作。今天录了三首歌，明天一早还要拍MV。临时加的，我有权拒绝。」",
+            "她说这话的时候语调平平的，但语气里有一种她这个年纪不该有的笃定。",
+            "他低头喝了一口汤。",
+            "「盐放多了吗？」",
+            "「放多了你也要喝完。」",
+            "北笙端着碗又喝了一口。确实有点咸，但还行。",
+            "他想起上个月的事。那天他刷微博，不小心点进了一个话题，叫#九霄到底有没有恋爱#。",
+            "话题里面吵得不可开交，有人贴了她和某个男明星的同框图逐帧分析，有人信誓旦旦地说她肯定是单身因为她「眼里没有世俗的欲望」，还有人做了长篇大论的情感状态分析报告。",
+            "北笙翻着那些帖子，一边觉得好笑一边又有点心虚，心想这些人要是知道他们讨论的这位顶流偶像每天最大的娱乐活动就是逛菜市场跟卖菜大妈砍价，不知道会是什么表情。",
+            "上周末九霄非要拉着他去菜市场买排骨，说要挑带脆骨的那种。卖肉的大叔认识她了，每次见面都热情招呼「小姑娘又来啦」，完全不知道这个每次来都要扯半天「便宜两块钱行不行」的高中生，是他孙女卧室墙上贴着的那张海报里的同一个人。",
+            "北笙问过她一次。",
+            "「你就不怕被人认出来？」",
+            "「认出来又怎样，偶像也要吃饭。」",
+            "说这话的时候她手里举着一个西红柿对着光看，表情认真得像是在鉴定一件艺术品。",
+            "北笙在旁边看着，觉得这个画面如果被粉丝拍到发到网上，大概能上热搜。不过上了热搜又怎样呢，他想，热搜上的那个九霄是舞台上光芒万丈的偶像，而眼前这个站在菜市场里挑西红柿的九霄，是他妹。",
+            "这两件事都是真的。",
+            "「发什么呆。」",
+            "九霄的声音把他拉回来。她已经坐在餐桌对面了，面前也摆着一碗汤，正用筷子夹一块排骨，动作熟练地把骨头剔掉，然后把肉放进他碗里。",
+            "「你自己吃。」",
+            "「我不喜欢吃带脆骨的。」",
+            "他没拆穿她。",
+            "厨房的灯很亮，照得整个餐厅暖融融的。电视没开，手机也各自放在一边，只有两个人面对面坐着，面前是两碗热汤和几盘卖相一般但味道还行的家常菜。",
+            "窗外的城市灯火通明，高楼大厦上的广告屏大概还在循环播放着当红偶像九霄的代言广告，但在这个小小的厨房里，只有穿着旧卫衣的少女低着头喝汤，马尾有点散了，几缕头发垂在碗边，被热气蒸得微微卷起来。",
+            "北笙端着碗又喝了一口。确实有点咸，但那一瞬间，心里被暖意填满。"
     ];
 
-    const STORY_START_INDEX = 2;
-    const TOTAL_STORY_LEN = SCRIPT.length - STORY_START_INDEX;
-    const dialogueArea = document.getElementById('dialogueArea');
+    // ======================= 九霄线已完成的完整文本 =======================
+    const JIOUXIAO_ENDING_LINES = [
+        "天空像是被谁撕开了一道口子，雷声从裂缝里滚落下来，轰隆隆地砸在窗玻璃上。",
+        "整栋老旧的公寓楼都跟着颤了颤，九霄蜷在沙发上的身子微微一抖。",
+        "身后传来轻微的脚步声声，然后是一双手臂温柔地拢过来。",
+        "北笙的胸膛贴上她的后背，温热的手掌覆上她耳尖，刚好把下一声炸雷隔绝在外。",
+        "「别怕，我在呢。」",
+        "他的声音很低。",
+        "但是却比窗外任何一记响雷都更有分量。",
+        "九霄顺势靠进那个熟悉的怀抱，雷声远了，模糊了，变成背景里闷闷的喘息。取而代之的，是背后一下一下有力的心跳，沉稳得像在替这个世界打着节拍。",
+        "她把脸埋进他胸口，声音闷闷的，软得像化开的糖。",
+        "「你也只有这种时候才像是我的哥哥了。」",
+        "北笙低头看她。从这个角度只能看见她微微翘起的发旋，和她不自觉地变红的耳廓。",
+        "他没来由地觉得嗓子有点紧，手臂不自觉地收紧了些。",
+        "「但我们现在是恋人不是吗？」",
+        "这话一出口，怀里的人明显僵了一瞬。",
+        "九霄耳尖上的粉色迅速蔓延到脸颊。",
+        "她轻轻挣了一下，当然没挣开，于是声音里带上了几分恼羞成软的意味。",
+        "顿了顿，又小声补了一句，像是自言自语，又像是在说服自己。",
+        "「嘛，虽然我们之间没有血缘关系，但是我姑且还是会把你当哥哥来看待的。」",
+        "北笙没接话。他知道她还有下文。",
+        "果然，沉默了几秒，九霄的声音更小了，小到几乎要被窗外的雨声吞没。",
+        "「毕竟要不是为了供你这个无能的哥哥上大学，我才不会那么拼去当偶像呢……」",
+        "北笙嘴角弯起来，下巴抵在她柔软的发顶上。洗发水的味道淡淡的，混着窗外雨水的气息。",
+        "「是是是，多亏了九霄大人。」",
+        "他的声音里有种藏不住的笑意，更多的却是某种说不清的心疼。",
+        "「那，这位大明星，能不能让哥哥再多抱一会儿？」",
+        "九霄没有回答。",
+        "但北笙却能够感受到，垂在他身侧的手指悄悄攥紧了他的衣角。",
+        "窗外雷声渐远，雨还淅淅沥沥地下着。",
+        "老旧公寓的客厅里，两个人安静地抱着，谁也没有再说话。",
+        "（场景转换）",
+        "第二天清晨，阳光从窗帘缝隙偷偷溜进来，在地板上画出一条细细的金线。",
+        "九霄先醒了。",
+        "她侧过脸，看着身边还在睡梦中的北笙。",
+        "睡着的时候他看起来比平时还要年轻，眉目舒展着，唇边似乎还挂着一点若有若无的笑。她忍不住伸出手指，轻轻戳了戳他的脸颊。",
+        "软软的。",
+        "她无声地笑起来，轻手轻脚地掀开被子下了床，赤着脚踩在冰凉的地板上，整个人轻快得像只猫。",
+        "围裙系在腰上的动作行云流水。煎蛋在平底锅里滋滋地响着，边缘微微焦黄，她熟练地翻了个面，顺手把牛奶倒进锅里温着。",
+        "她一边哼着自己新单曲的旋律，一边继续做着早餐，哼到副歌部分的时候记起来是首情歌，耳根又悄悄地红了。",
+        "「哥哥，起床啦。」",
+        "她回到床边，俯下身子，声音温柔地说。顺手把被子往下拉了拉，露出北笙睡得乱糟糟的头发。",
+        "北笙迷迷糊糊地睁开眼，阳光逆着九霄的身影洒下来，她整个人都被镀上了一层淡淡的光。他眨了眨眼，恍惚间觉得这辈子大概就是为了每天早上的这个瞬间。",
+        "早餐很安静。",
+        "九霄用叉子戳着煎蛋，蛋黄液慢慢淌出来，她也不急着吃，眼神时不时地飘向对面正埋头吃着的北笙，嘴角的弧度怎么都压不下去。",
+        "北笙自然注意到了，但没有戳穿她。",
+        "吃完早餐后，两人准备去上学了。",
+        "九霄站在玄关，手扶着鞋柜，左脚已经踩上了小皮鞋，却突然不动了。",
+        "她扯住北笙的袖子，仰起头。晨光里她的眼睛亮得像蓄了一汪水，声音又软又黏，像在撒娇又像在理所当然地讨要着什么。",
+        "「哥哥，人家想要那个嘛。」",
+        "北笙系鞋带的手顿了一下。",
+        "「哪个？」",
+        "九霄的脸上浮起一层薄红，却没有移开视线，眼睛亮晶晶地盯着他，像是在盯着一颗很想吃到的糖果。",
+        "北笙心里清楚得很，但还是忍不住想逗她。他嘴角微微上扬，明知故问。",
+        "「你不说出来我怎么知道？」",
+        "九霄的脚轻轻跺了一下地板。",
+        "但是北笙还是装作一副什么都不知道的样子看着她。",
+        "「就是……<ruby>mua<rt>亲亲</rt></ruby>啦！」",
+        "她几乎是喊出来的，尾音却在一半的地方软了下去。脸红得像要烧起来，却还要嘴硬般地瞪着北笙。",
+        "「为什么非要人家说出来啊，哥哥坏！」",
+        "北笙终于没忍住笑出了声。他弯下腰，一只手扶住她的肩膀，在她额头上轻轻印下一个吻。然后顿了顿，又飞快地偏过头，在她嘴角处落下了第二个。",
+        "九霄的耳朵红透了。但她却并没有躲,同时用手偷偷地摸了一下北笙的口袋。",
+        "「这还差不多嘛……」",
+        "她小声嘟囔着，声音闷在围巾里，但眼睛里的光怎么都藏不住。",
+        "两个人磨蹭了半天，终于出了门。",
+        "楼道里北笙推着他那辆破旧的自行车，链条发出咔嗒咔嗒的声响。",
+        "九霄走在他身后，踩着他的影子，两个人在狭窄的楼梯间一前一后地往下走。",
+        "出了小区门口，一个向左，一个向右，往同一个城市的不同方向。",
+        "北笙骑着自行车往XX大学赶。那是一所说不上好也说不上坏的学校，跟他的成绩一样，平平无奇，普普通通。",
+        "春风灌进他的校服袖子，鼓鼓囊囊的，他一只手扶着车把，另一只手无意识地在口袋里摸了摸。",
+        "那里有早晨九霄悄悄塞进去的一颗奶糖。",
+        "九霄要坐地铁去YY中学。那是全市数一数二的重点中学，她穿着校服裙站在站台上，旁边的大叔认出了她，激动地掏出手机拍照。",
+        "她条件反射般地露出标准的偶像微笑，心里却在想她的哥哥现在走到哪里了，会不会迟到。",
+        "今天实在踩不上点了。",
+        "北笙和九霄两人几乎同时如此想到。",
+        "九霄几乎是贴着上课铃冲进教室的。她气喘吁吁地站在门口，胸口还在剧烈起伏，额前的碎发被汗粘在皮肤上。",
+        "班主任推了推眼镜，镜片反了一下光。",
+        "「九霄同学，你又迟到了。」",
+        "她的声音不大，但教室里安静得能听见窗外操场上体育课的哨声。",
+        "「虽然你是偶像，但学校有学校的规定。」",
+        "九霄低下头，刘海遮住了大半张脸。班主任以为她在反省，其实她的嘴角正偷偷地翘起来。然后她在心里把哥哥骂了三遍——不对，是四遍。",
+        "而北笙在大学那边也好不到哪里去。",
+        "阶梯教室里教授已经开始点名，他猫着腰从后门溜进来，书包带子从肩膀上滑下去，手忙脚乱地去接，发出不小的动静。室友回过头来嘲笑他。",
+        "「又、迟、到、啊、臭、妹、控。」",
+        "北笙瞪了他一眼，在旁边的座位上坐下来，翻开课本才发现拿错了。",
+        "早上出门太急，他拿的是九霄的笔记本。",
+        "翻开第一页，是她工工整整的字迹：「笨蛋哥哥专用记事本。」，旁边还画了个气鼓鼓的小人。",
+        "他的手指在那一行字上停了一会儿，然后慢慢弯起嘴角。",
+        "窗外，五月初的风轻轻吹过，吹动了两扇不同方向窗户的窗帘。这个城市的东边和西边，两个正在上课的人，在同一秒不约而同地抬起头看了一眼窗外。",
+        "然后又在同一秒，不约而同地想——",
+        "「明天，明天一定早点出门。」"
+    ];
+
+    const MAIN_LINES = SCRIPT.filter(line => !line.startsWith("[OPT:"));
+    const MAIN_TOTAL = MAIN_LINES.length - 2;
+    const JIOUXIAO_TOTAL = JIOUXIAO_ENDING_LINES.length;
+    let mainIdx = 2;
+    let displayedCount = 0;
+    let isDisclaimer = true;
+    let waitingOption = false;
+    let branchActive = false;
+    let branchQueue = [];
+    let afterBranch = null;
+    let gameFinished = false;
+    let postEndClicks = 0;
+    let eggShown = false;
+    let endingDisplayed = false;
+    let branchTotalLines = 0;
+    let branchDisplayed = 0;
+    let affection = { jiuxiao: 0, ziran: 0, juhao: 0 };
+    const dialDiv = document.getElementById('dialogueArea');
     const progressSpan = document.getElementById('progressText');
     const resetBtn = document.getElementById('resetBtn');
     const advanceBtn = document.getElementById('clickAdvanceBtn');
-    const gameContainer = document.getElementById('gameContainer');
-    const startHintSub = document.getElementById('startHintSub');
-    let isDisclaimerMode = true;
-    let currentStoryIndex = STORY_START_INDEX;
-    let displayedStoryCount = 0;
-    let postEndClickCount = 0;
-    let eggTriggered = false;
-    const sponsorModal = document.getElementById('sponsorModal');
-    const sponsorImageModal = document.getElementById('sponsorImageModal');
-    const sponsorListContainer = document.getElementById('sponsorListContainer');
-    const closeSponsorBtn = document.getElementById('closeSponsorModalBtn');
-    const openSponsorImageBtn = document.getElementById('openSponsorImageBtn');
-    const closeImageModalBtn = document.getElementById('closeImageModalBtn');
-    const sponsorListBtn = document.getElementById('sponsorListBtn');
-    const sponsors = [
-          "南城北笙"
-    ];
+    const container = document.getElementById('gameContainer');
+    const startHint = document.getElementById('startHintSub');
+    const optModal = document.getElementById('optionModal');
+    const optText = document.getElementById('optionText');
+    const optBtns = document.getElementById('optionButtonsContainer');
+    const affJXSpan = document.getElementById('affJX');
+    const affZRSpan = document.getElementById('affZR');
+    const affJHSpan = document.getElementById('affJH');
 
-    function renderSponsorList() {
-        sponsorListContainer.innerHTML = '';
-        sponsors.forEach(name => {
-            const p = document.createElement('p');
-            p.textContent = name;
-            sponsorListContainer.appendChild(p);
-        });
+    function updateAffUI() {
+        affJXSpan.innerText = affection.jiuxiao;
+        affZRSpan.innerText = affection.ziran;
+        affJHSpan.innerText = affection.juhao;
+    }
+    function addAff(ch, delta) {
+        affection[ch] += delta;
+        updateAffUI();
     }
 
-
-    function openSponsorListModal() {
-        renderSponsorList();
-        sponsorModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    function closeSponsorListModal() {
-        sponsorModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function openSponsorImageModalFn() {
-        sponsorImageModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSponsorImageModal() {
-        sponsorImageModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function hideStartHint() {
-        if (startHintSub) {
-            startHintSub.style.visibility = 'hidden';
+    function appendText(html, countAsMain = true) {
+        const line = document.createElement('div');
+        line.className = 'dialogue-line';
+        line.innerHTML = html;
+        dialDiv.appendChild(line);
+        dialDiv.scrollTop = dialDiv.scrollHeight;
+        if (countAsMain && !isDisclaimer && !gameFinished && !branchActive) {
+            displayedCount++;
+            updateProgress();
         }
     }
-    function showStartHint() {
-        if (startHintSub) {
-            startHintSub.style.visibility = 'visible';
+
+    function updateProgress() {
+        if (isDisclaimer) {
+            progressSpan.innerText = `未开始 / ${MAIN_TOTAL}`;
+        } else if (branchActive && branchTotalLines > 0) {
+            progressSpan.innerText = `九霄线 ${branchDisplayed} / ${branchTotalLines} 🌸`;
+        } else if (gameFinished) {
+            progressSpan.innerText = `故事终章 ✨`;
+        } else {
+            progressSpan.innerText = `📜 ${displayedCount} / ${MAIN_TOTAL}`;
         }
     }
-    function showEasterEgg() {
-        if (document.querySelector('.easter-egg-toast')) return;
-        const eggDiv = document.createElement('div');
-        eggDiv.className = 'easter-egg-toast';
-        eggDiv.innerHTML = '我说结束了你尔多龙吗';
-        document.body.appendChild(eggDiv);
-        setTimeout(() => {
-            if (eggDiv && eggDiv.parentNode) eggDiv.remove();
-        }, 5000);
+
+    function showDisclaimer() {
+        dialDiv.innerHTML = '';
+        appendText(MAIN_LINES[0], false);
+        const hint = document.createElement('div');
+        hint.className = 'dialogue-line';
+        hint.style.borderLeftColor = '#ffd58c';
+        hint.style.opacity = '0.85';
+        hint.innerHTML = '🌸 点击画面或「点击继续」按钮，清空提示并开启完整剧情 🌸';
+        dialDiv.appendChild(hint);
+        dialDiv.scrollTop = 0;
+        updateProgress();
     }
-    function showEndToast(message = '✨ 故事已经结束，点击重置可重复观看 ✨') {
-        const toast = document.createElement('div');
-        toast.innerText = message;
-        toast.style.position = 'fixed';
-        toast.style.bottom = '30px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.backgroundColor = '#2a2f3fe6';
-        toast.style.color = '#ffda99';
-        toast.style.padding = '8px 20px';
-        toast.style.borderRadius = '60px';
-        toast.style.fontSize = '0.85rem';
-        toast.style.backdropFilter = 'blur(8px)';
-        toast.style.zIndex = '999';
-        toast.style.pointerEvents = 'none';
-        toast.style.whiteSpace = 'nowrap';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 1500);
+
+    function startBranch(lines, onFinish, isJiuxiaoBranch = false) {
+        if (!lines.length) { if(onFinish) onFinish(); return; }
+        branchActive = true;
+        branchQueue = [...lines];
+        afterBranch = onFinish;
+        if (isJiuxiaoBranch) {
+            branchTotalLines = lines.length;
+            branchDisplayed = 0;
+        } else {
+            branchTotalLines = 0;
+        }
+        updateProgress();
     }
-    function appendStoryLine(htmlContent) {
+
+    function advanceBranch() {
+        if (!branchActive || branchQueue.length === 0) {
+            branchActive = false;
+            branchTotalLines = 0;
+            updateProgress();
+            if (afterBranch) {
+                let cb = afterBranch;
+                afterBranch = null;
+                cb();
+            }
+            return false;
+        }
+        const line = branchQueue.shift();
         const lineDiv = document.createElement('div');
         lineDiv.className = 'dialogue-line';
-        lineDiv.innerHTML = htmlContent;
-        dialogueArea.appendChild(lineDiv);
-        dialogueArea.scrollTop = dialogueArea.scrollHeight;
-        displayedStoryCount++;
-        updateProgress();
-    }
-    function updateProgress() {
-        if (isDisclaimerMode) {
-            progressSpan.innerText = `📜 未开始 / ${TOTAL_STORY_LEN}`;
-        } else {
-            progressSpan.innerText = `📜 ${displayedStoryCount} / ${TOTAL_STORY_LEN}`;
-        }
-    }
-    function renderDisclaimer() {
-        dialogueArea.innerHTML = '';
-        const disclaimerDiv = document.createElement('div');
-        disclaimerDiv.className = 'dialogue-line';
-        disclaimerDiv.innerHTML = SCRIPT[0];
-        dialogueArea.appendChild(disclaimerDiv);
-        const hintDiv = document.createElement('div');
-        hintDiv.className = 'dialogue-line';
-        hintDiv.style.borderLeftColor = '#ffd58c';
-        hintDiv.style.opacity = '0.85';
-        hintDiv.innerHTML = '✨ 点击画面或「点击继续」按钮，将清空本提示并开启完整剧情 ✨';
-        dialogueArea.appendChild(hintDiv);
-        dialogueArea.scrollTop = 0;
-    }
-    function resetGame() {
-        dialogueArea.innerHTML = '';
-        isDisclaimerMode = true;
-        currentStoryIndex = STORY_START_INDEX;
-        displayedStoryCount = 0;
-        postEndClickCount = 0;
-        eggTriggered = false;
-        const existingEgg = document.querySelector('.easter-egg-toast');
-        if (existingEgg) existingEgg.remove();
-        const secondWhisper = document.querySelector('.second-whisper');
-        if (secondWhisper) secondWhisper.remove();
-        renderDisclaimer();
-        advanceBtn.innerText = '▶ 点击开始正文';
-        advanceBtn.style.opacity = '1';
-        updateProgress();
-        showStartHint();
-        dialogueArea.scrollTop = 0;
-        const toasts = document.querySelectorAll('.end-toast-msg');
-        toasts.forEach(t => t.remove());
-        closeSponsorListModal();
-        closeSponsorImageModal();
-    }
-    function startStory() {
-        if (!isDisclaimerMode) return;
-        dialogueArea.innerHTML = '';
-        isDisclaimerMode = false;
-        currentStoryIndex = STORY_START_INDEX;
-        displayedStoryCount = 0;
-        postEndClickCount = 0;
-        eggTriggered = false;
-        advanceBtn.innerText = '▶ 点击继续 · 下一句';
-        advanceBtn.style.opacity = '1';
-        updateProgress();
-        hideStartHint();
-        if (currentStoryIndex < SCRIPT.length) {
-            const firstLine = SCRIPT[currentStoryIndex];
-            appendStoryLine(firstLine);
-            currentStoryIndex++;
-        } else {
-            console.warn("剧本为空");
-        }
-        if (currentStoryIndex >= SCRIPT.length) {
-            advanceBtn.innerText = 'THE END';
-            advanceBtn.style.opacity = '0.7';
-        }
-    }
-    function showNextStoryLine() {
-        if (currentStoryIndex < SCRIPT.length) {
-            const lineHtml = SCRIPT[currentStoryIndex];
-            appendStoryLine(lineHtml);
-            currentStoryIndex++;
+        lineDiv.innerHTML = line;
+        dialDiv.appendChild(lineDiv);
+        dialDiv.scrollTop = dialDiv.scrollHeight;
+        if (branchTotalLines > 0) {
+            branchDisplayed++;
             updateProgress();
-            if (currentStoryIndex >= SCRIPT.length) {
-                advanceBtn.innerText = 'THE END';
-                advanceBtn.style.opacity = '0.7';
-                showEndToast('📖 故事正文完结 · 感谢阅读 📖');
-            } else {
-                advanceBtn.innerText = '▶ 点击继续 · 下一句';
-                advanceBtn.style.opacity = '1';
-            }
-        } else {
-            handlePostEndExtraClick();
         }
-    }
-    function handlePostEndExtraClick() {
-        postEndClickCount++;
-        if (postEndClickCount === 10 && !eggTriggered) {
-            eggTriggered = true;
-            showEasterEgg();
-            return;
-        }
-        let tipMsg = '📖 故事已经结束，点击重置可重复观看 📖';
-        if (postEndClickCount === 10 && eggTriggered) {
-            tipMsg = '⭐ 故事已经结束，点击重置可重复观看 ⭐';
-        }
-        showEndToast(tipMsg);
-        if (postEndClickCount === 20 && !document.querySelector('.second-whisper')) {
-            const whisper = document.createElement('div');
-            whisper.innerText = '💢还在点？ 你点你妈呢💢';
-            whisper.style.position = 'fixed';
-            whisper.style.bottom = '80px';
-            whisper.style.left = '50%';
-            whisper.style.transform = 'translateX(-50%)';
-            whisper.style.backgroundColor = '#1e1a2fcc';
-            whisper.style.color = '#ffbc6e';
-            whisper.style.padding = '6px 16px';
-            whisper.style.borderRadius = '40px';
-            whisper.style.fontSize = '0.75rem';
-            whisper.style.backdropFilter = 'blur(8px)';
-            whisper.style.zIndex = '998';
-            whisper.style.pointerEvents = 'none';
-            whisper.style.whiteSpace = 'nowrap';
-            whisper.classList.add('second-whisper');
-            document.body.appendChild(whisper);
-            setTimeout(() => whisper.remove(), 2000);
-        }
-    }
-    function handleAdvance(e) {
-        const selection = window.getSelection();
-        if (selection && !selection.isCollapsed) return;
-        if (isDisclaimerMode) {
-            startStory();
-            return;
-        }
-        if (currentStoryIndex < SCRIPT.length) {
-            showNextStoryLine();
-            return;
-        }
-        handlePostEndExtraClick();
-    }
-
-    function convertRubyNodeToPlainText(node) {
-        const blockTags = new Set(['P', 'DIV', 'SECTION', 'ARTICLE', 'LI', 'BLOCKQUOTE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BR']);
-        function getEffectiveText(nodePart, isBlockContext = false) {
-            if (nodePart.nodeType === Node.TEXT_NODE) return nodePart.textContent;
-            if (nodePart.nodeType === Node.ELEMENT_NODE) {
-                const tagName = nodePart.tagName.toUpperCase();
-                if (tagName === 'RUBY') {
-                    let displayText = '';
-                    let rubyText = '';
-                    for (const child of nodePart.childNodes) {
-                        if (child.nodeType === Node.TEXT_NODE) displayText += child.textContent;
-                        else if (child.nodeType === Node.ELEMENT_NODE) {
-                            if (child.tagName.toUpperCase() === 'RT') rubyText += child.textContent;
-                            else displayText += getEffectiveText(child, false);
-                        }
+        if (branchQueue.length === 0) {
+            setTimeout(() => {
+                if (branchActive && branchQueue.length === 0) {
+                    branchActive = false;
+                    branchTotalLines = 0;
+                    updateProgress();
+                    if (afterBranch) {
+                        let cb = afterBranch;
+                        afterBranch = null;
+                        cb();
                     }
-                    if (rubyText.trim() !== '') return `${displayText}（${rubyText}）`;
-                    else return displayText;
                 }
-                if (tagName === 'BR') return '\n';
-                let prefix = '', suffix = '';
-                if (blockTags.has(tagName)) { prefix = '\n'; suffix = '\n'; }
-                let innerText = '';
-                for (const child of nodePart.childNodes) innerText += getEffectiveText(child, blockTags.has(tagName));
-                return prefix + innerText + suffix;
-            }
-            return '';
+            }, 50);
         }
-        return getEffectiveText(node);
-    }
-    function onCopyHandler(e) {
-        const selection = window.getSelection();
-        if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
-        const range = selection.getRangeAt(0);
-        const clonedFragment = range.cloneContents();
-        let convertedPlainText = '';
-        for (let node of clonedFragment.childNodes) convertedPlainText += convertRubyNodeToPlainText(node);
-        convertedPlainText = convertedPlainText.replace(/^\n+/, '').replace(/\n+$/, '\n');
-        const serializer = new XMLSerializer();
-        let originalHtml = '';
-        for (let node of clonedFragment.childNodes) originalHtml += serializer.serializeToString(node);
-        e.preventDefault();
-        e.clipboardData.setData('text/plain', convertedPlainText);
-        e.clipboardData.setData('text/html', originalHtml);
+        return true;
     }
 
-    document.addEventListener('copy', onCopyHandler);
+    function showOptionDialog(title, options, onSelect) {
+        waitingOption = true;
+        optText.innerText = title;
+        optBtns.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                optModal.classList.remove('active');
+                if (opt.onSelect) opt.onSelect();
+                if (onSelect) onSelect(opt.value);
+                waitingOption = false;
+            };
+            optBtns.appendChild(btn);
+        });
+        optModal.classList.add('active');
+    }
+
+    // 选项1
+    function showFirstChoice() {
+        showOptionDialog("面对奇末的吐槽，你心中更在意谁？", [
+            { text: "💖 九霄——想起厨房里的温暖背影", value: "jiuxiao", onSelect: () => {
+                addAff('jiuxiao', 2);
+                startBranch(["✨ 你想起九霄穿着你的卫衣认真煲汤的样子，胸口涨满了柔软的暖意。"], () => {});
+            } },
+            { text: "🌿 孜然——冷淡外表下的细腻", value: "ziran", onSelect: () => {
+                addAff('ziran', 2);
+                startBranch(["🍃 脑海里飘过孜然帮你补习功课时不经意露出的认真侧脸，莫名让人心跳。"], () => {});
+            } },
+            { text: "✏️ 句号——古灵精怪的二次元同好", value: "juhao", onSelect: () => {
+                addAff('juhao', 2);
+                startBranch(["📖 句号推了推眼镜朝你意味深长地笑，仿佛又在脑补新的同人设定，气氛忽然欢脱起来。"], () => {});
+            } }
+        ]);
+    }
+
+    // 选项2
+    function showSecondChoice() {
+        showOptionDialog("你的心意开始萌动，你想要靠近谁？", [
+            { text: "🌟 九霄——想守护她的日常", value: "jiuxiao", onSelect: () => {
+                addAff('jiuxiao', 2);
+                startBranch(["🥣 九霄发来新消息：哥，汤里加了玉米，快点回来。你嘴角不自觉上扬。"], () => {});
+            } },
+            { text: "🍂 孜然——想融化她冰冷下的温柔", value: "ziran", onSelect: () => {
+                addAff('ziran', 2);
+                startBranch(["🍬 孜然路过你身边时悄悄放下一颗薄荷糖，面无表情却耳根微红。"], () => {});
+            } },
+            { text: "✍️ 句号——有趣的灵魂万里挑一", value: "juhao", onSelect: () => {
+                addAff('juhao', 2);
+                startBranch(["📝 句号塞给你一张纸条：今晚有空吗？给你看个好东西（新坑主角原型是你哦~）"], () => {});
+            } }
+        ]);
+    }
+
+    function playJiuxiaoEnding() {
+        if (endingDisplayed) return;
+        endingDisplayed = true;
+        startBranch(JIOUXIAO_ENDING_LINES, () => {
+            gameFinished = true;
+            branchActive = false;
+            branchTotalLines = 0;
+            updateProgress();
+            appendText("<br>✨ 九霄线 · 完 ✨<br>感谢你的陪伴，故事永不落幕。", false);
+        }, true);
+    }
+
+    function finishGameEarly() {
+        if (endingDisplayed) return;
+        endingDisplayed = true;
+        gameFinished = true;
+        appendText("<br>✨ 故事已经结束，点击重置可重复观看 ✨", false);
+        updateProgress();
+    }
+
+    function triggerEnding() {
+        if (gameFinished || endingDisplayed) return;
+        let maxAff = Math.max(affection.jiuxiao, affection.ziran, affection.juhao);
+        if (maxAff < 3) {
+            playJiuxiaoEnding();
+            return;
+        }
+        let topChar = null;
+        if (affection.jiuxiao === maxAff) topChar = 'jiuxiao';
+        else if (affection.ziran === maxAff) topChar = 'ziran';
+        else if (affection.juhao === maxAff) topChar = 'juhao';
+        
+        if (topChar === 'jiuxiao') {
+            playJiuxiaoEnding();
+        } else {
+            let confirmMsg = `作者暂未完成该角色路线的剧情。\n是否观看已完成的「九霄线」完整故事？\n\n点击“确定”进入九霄线，点击“取消”结束游戏（之后可触发彩蛋）。`;
+            if (window.confirm(confirmMsg)) {
+                playJiuxiaoEnding();
+            } else {
+                finishGameEarly();
+            }
+        }
+    }
+
+    let rawPos = 2;
+    function advanceMain() {
+        if (gameFinished) return;
+        while (rawPos < SCRIPT.length && SCRIPT[rawPos].startsWith("[OPT:")) {
+            const marker = SCRIPT[rawPos];
+            rawPos++;
+            if (marker === "[OPT:first]") {
+                showFirstChoice();
+                return;
+            } else if (marker === "[OPT:second]") {
+                showSecondChoice();
+                return;
+            }
+        }
+        if (mainIdx >= MAIN_LINES.length) {
+            if (!gameFinished && !endingDisplayed) triggerEnding();
+            return;
+        }
+        const line = MAIN_LINES[mainIdx];
+        appendText(line, true);
+        mainIdx++;
+        rawPos++;
+        if (mainIdx >= MAIN_LINES.length && !gameFinished && !endingDisplayed) {
+            triggerEnding();
+        }
+    }
+
+    function handleAdvance(e) {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+        if (waitingOption) return;
+        if (isDisclaimer) {
+            startGame();
+            return;
+        }
+        if (gameFinished) {
+            postEndClicks++;
+            if (postEndClicks === 10 && !eggShown) {
+                eggShown = true;
+                const eggDiv = document.createElement('div');
+                eggDiv.className = 'easter-egg-toast';
+                eggDiv.innerHTML = '我说结束了你尔多龙吗';
+                document.body.appendChild(eggDiv);
+                setTimeout(() => eggDiv.remove(), 5000);
+            } else if (postEndClicks === 20) {
+                const w = document.createElement('div');
+                w.innerText = '💢还在点？ 你点你妈呢💢';
+                w.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#1e1a2fcc; color:#ffbc6e; padding:6px 16px; border-radius:40px; font-size:0.75rem; backdrop-filter:blur(8px); z-index:998; pointer-events:none;';
+                document.body.appendChild(w);
+                setTimeout(() => w.remove(), 2000);
+            }
+            return;
+        }
+        if (branchActive) {
+            advanceBranch();
+            return;
+        }
+        if (mainIdx < MAIN_LINES.length) {
+            advanceMain();
+        } else {
+            if (!gameFinished && !endingDisplayed) triggerEnding();
+        }
+    }
+
+    function startGame() {
+        if (!isDisclaimer) return;
+        dialDiv.innerHTML = '';
+        isDisclaimer = false;
+        mainIdx = 2;
+        rawPos = 2;
+        displayedCount = 0;
+        waitingOption = false;
+        branchActive = false;
+        branchQueue = [];
+        afterBranch = null;
+        gameFinished = false;
+        endingDisplayed = false;
+        postEndClicks = 0;
+        eggShown = false;
+        branchTotalLines = 0;
+        branchDisplayed = 0;
+        affection = { jiuxiao: 0, ziran: 0, juhao: 0 };
+        updateAffUI();
+        updateProgress();
+        startHint.style.visibility = 'hidden';
+        advanceBtn.style.opacity = "1";
+        advanceMain();
+    }
+
+    function resetGame() {
+        if (window.confirm("重置游戏会丢失所有好感度及进度，确定回到最初吗？")) {
+            dialDiv.innerHTML = '';
+            isDisclaimer = true;
+            mainIdx = 2;
+            rawPos = 2;
+            displayedCount = 0;
+            waitingOption = false;
+            branchActive = false;
+            branchQueue = [];
+            afterBranch = null;
+            gameFinished = false;
+            endingDisplayed = false;
+            postEndClicks = 0;
+            eggShown = false;
+            branchTotalLines = 0;
+            branchDisplayed = 0;
+            affection = { jiuxiao: 0, ziran: 0, juhao: 0 };
+            updateAffUI();
+            showDisclaimer();
+            advanceBtn.style.opacity = "1";
+            startHint.style.visibility = 'visible';
+            optModal.classList.remove('active');
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+    }
+
+    const sponsors = ["南城北笙"];
+    function renderSponsorList() {
+        const cont = document.getElementById('sponsorListContainer');
+        cont.innerHTML = '';
+        sponsors.forEach(n => { const p = document.createElement('p'); p.textContent = n; cont.appendChild(p); });
+    }
+    document.getElementById('sponsorListBtn')?.addEventListener('click', () => document.getElementById('sponsorModal').classList.add('active'));
+    document.getElementById('closeSponsorModalBtn')?.addEventListener('click', () => document.getElementById('sponsorModal').classList.remove('active'));
+    document.getElementById('openSponsorImageBtn')?.addEventListener('click', () => document.getElementById('sponsorImageModal').classList.add('active'));
+    document.getElementById('closeImageModalBtn')?.addEventListener('click', () => document.getElementById('sponsorImageModal').classList.remove('active'));
+    document.getElementById('sponsorModal')?.addEventListener('click', (e) => { if(e.target === document.getElementById('sponsorModal')) document.getElementById('sponsorModal').classList.remove('active'); });
+    document.getElementById('sponsorImageModal')?.addEventListener('click', (e) => { if(e.target === document.getElementById('sponsorImageModal')) document.getElementById('sponsorImageModal').classList.remove('active'); });
+
+    document.addEventListener('copy', (e) => {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed) e.clipboardData.setData('text/plain', sel.toString());
+        e.preventDefault();
+    });
     advanceBtn.addEventListener('click', (e) => { e.stopPropagation(); handleAdvance(e); });
-    gameContainer.addEventListener('click', (e) => {
-        if (e.target === resetBtn || e.target.closest?.('.reset-btn') || e.target === advanceBtn || e.target.closest?.('#clickAdvanceBtn') || e.target.closest?.('#sponsorListBtn')) return;
+    container.addEventListener('click', (e) => {
+        if (e.target.closest?.('.reset-btn') || e.target.closest?.('#clickAdvanceBtn') || e.target.closest?.('#sponsorListBtn')) return;
         handleAdvance(e);
     });
     resetBtn.addEventListener('click', (e) => { e.stopPropagation(); resetGame(); });
-    
-    sponsorListBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openSponsorListModal();
-    });
-    closeSponsorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeSponsorListModal();
-    });
-    openSponsorImageBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openSponsorImageModalFn();
-    });
-    closeImageModalBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeSponsorImageModal();
-    });
-    sponsorModal.addEventListener('click', (e) => {
-        if (e.target === sponsorModal) closeSponsorListModal();
-    });
-    sponsorImageModal.addEventListener('click', (e) => {
-        if (e.target === sponsorImageModal) closeSponsorImageModal();
-    });
-
-    resetGame();
     renderSponsorList();
     console.log('你看你妈呢');
+    resetGame();
 </script>
 </body>
 </html>

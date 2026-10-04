@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>幸运转盘</title>
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family: system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #3a2264 0%, #1a1132 45%, #0a0714 100%);
+    color:#fff;
+    padding:28px 20px 44px;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app{ width:100%; max-width:520px; text-align:center; }
+
+  h1{
+    font-size: clamp(22px, 5.5vw, 30px);
+    margin:0 0 8px;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,#ffe9a8,#ffb347,#ff7ba9);
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+  }
+  .sub{
+    margin:0 0 26px;
+    font-size:14px;
+    color:#b9aede;
+    letter-spacing:.5px;
+  }
+
+  .mode-panel{
+    position:fixed;
+    right:clamp(12px, 2.6vw, 34px);
+    top:50%;
+    transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:11px;
+    z-index:30;
+  }
+  .mode-btn{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 18px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.07);
+    color:#d9d0f5;
+    font-family:inherit;
+    font-size:15px; font-weight:700; letter-spacing:1px;
+    white-space:nowrap;
+    cursor:pointer;
+    touch-action:manipulation;
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    transition:transform .2s ease, background .25s, color .25s,
+               border-color .25s, box-shadow .25s;
+  }
+  .mode-btn:hover{
+    transform:translateX(-4px);
+    background:rgba(255,255,255,.13);
+    color:#fff;
+  }
+  .mode-btn:active{ transform:translateX(-4px) scale(.96); }
+  .mode-btn.active{
+    background:linear-gradient(135deg,#ffe79b,#ffb347 55%,#ff8a3c);
+    color:#4a2200;
+    border-color:rgba(255,255,255,.85);
+    box-shadow:0 8px 24px rgba(255,150,60,.38);
+    transform:translateX(-4px);
+  }
+  .mode-btn:focus-visible{
+    outline:2px solid #ffe79b;
+    outline-offset:3px;
+  }
+
+  .wheel-wrap{
+    position:relative;
+    width:min(84vw, 380px);
+    aspect-ratio:1 / 1;
+    margin:0 auto;
+  }
+  .wheel-wrap::before{
+    content:"";
+    position:absolute; inset:-14px;
+    border-radius:50%;
+    background:conic-gradient(from 0deg,#ffd76a,#ff7ba9,#8f7bff,#5ce1e6,#ffd76a);
+    filter:blur(16px);
+    opacity:.45;
+    z-index:0;
+    animation:glow 6s linear infinite;
+  }
+  @keyframes glow{ to{ transform:rotate(360deg); } }
+
+  canvas{
+    position:relative;
+    z-index:1;
+    width:100%; height:100%;
+    display:block;
+    border-radius:50%;
+    box-shadow:
+      0 0 0 7px rgba(255,255,255,.10),
+      0 0 0 8px rgba(255,255,255,.22),
+      0 22px 55px rgba(0,0,0,.65);
+  }
+
+  .pointer{
+    position:absolute;
+    left:50%; top:-14px;
+    transform:translateX(-50%);
+    width:0; height:0;
+    border-left:15px solid transparent;
+    border-right:15px solid transparent;
+    border-top:34px solid #ff4d6d;
+    filter:drop-shadow(0 5px 8px rgba(0,0,0,.55));
+    z-index:4;
+  }
+
+  #spinBtn{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:26.5%;
+    aspect-ratio:1 / 1;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.9);
+    background:linear-gradient(150deg,#ffe79b,#ffb347 45%,#ff8a3c);
+    color:#5a2c00;
+    font-weight:900;
+    font-size:clamp(14px,3.8vw,19px);
+    letter-spacing:1px;
+    cursor:pointer;
+    z-index:5;
+    font-family:inherit;
+    touch-action:manipulation;
+    box-shadow:
+      0 8px 22px rgba(0,0,0,.5),
+      inset 0 -5px 10px rgba(180,90,0,.35),
+      inset 0 4px 8px rgba(255,255,255,.6);
+    transition:transform .16s ease, filter .25s ease, box-shadow .25s;
+  }
+  #spinBtn:hover:not(:disabled){ transform:translate(-50%,-50%) scale(1.07); }
+  #spinBtn:active:not(:disabled){ transform:translate(-50%,-50%) scale(.94); }
+  #spinBtn:disabled{ cursor:not-allowed; filter:grayscale(.45) brightness(.85); }
+  #spinBtn:focus-visible{
+    outline:3px solid #ffe79b;
+    outline-offset:4px;
+  }
+
+  .result-card{
+    margin:30px auto 0;
+    width:100%;
+    display:flex; align-items:flex-start; gap:16px;
+    padding:16px 18px;
+    border-radius:18px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.15);
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+    text-align:left;
+    opacity:0;
+    transform:translateY(14px) scale(.97);
+    pointer-events:none;
+    transition:opacity .4s ease, transform .4s cubic-bezier(.2,.9,.3,1.25),
+               background .25s, border-color .25s;
+  }
+  .result-card.show{
+    opacity:1;
+    transform:none;
+    pointer-events:auto;
+  }
+  .result-emoji{
+    flex:0 0 auto;
+    width:70px; height:70px;
+    display:grid; place-items:center;
+    font-size:38px;
+    line-height:1;
+    border-radius:16px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.16);
+    overflow:hidden;
+  }
+  .result-info{ flex:1 1 auto; min-width:0; padding-top:2px; }
+  .result-label{ font-size:12.5px; color:#c0b4e6; letter-spacing:1px; }
+  .result-name{
+    font-size:22px; font-weight:800; margin:3px 0 0;
+    background:linear-gradient(90deg,#ffe9a8,#ffb347);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    line-height:1.3;
+  }
+  .result-detail{
+    margin-top:6px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:#cbbdf2;
+    letter-spacing:.2px;
+  }
+  .result-detail:empty{ display:none; }
+
+  @media (max-width:360px){
+    .result-emoji{ width:58px; height:58px; font-size:32px; }
+    .result-name{ font-size:19px; }
+    .result-detail{ font-size:12.5px; }
+  }
+
+  @media (max-width: 900px){
+    body{
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding:20px 20px 44px;
+    }
+    .mode-panel{
+      position:static;
+      transform:none;
+      flex-direction:row;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      margin-bottom:20px;
+    }
+    .mode-btn{ padding:9px 14px; font-size:13.5px; }
+    .mode-btn:hover,
+    .mode-btn.active{ transform:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .wheel-wrap::before{ animation:none; }
+    .result-card{ transition:opacity .2s ease; transform:none; }
+    #spinBtn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mode-panel" id="modePanel" role="group" aria-label="抽奖模式选择">
+  <button type="button" class="mode-btn"        data-mode="human"  aria-pressed="false">🧑 随机人类</button>
+  <button type="button" class="mode-btn"        data-mode="hunter" aria-pressed="false">👹 随机屠夫</button>
+  <button type="button" class="mode-btn active" data-mode="talent" aria-pressed="true">🎯 随机天赋</button>
+</div>
+
+<div class="app">
+  <h1>🎡 幸运转盘</h1>
+  <p class="sub">点击中间按钮开始抽奖</p>
+
+  <div class="wheel-wrap">
+    <canvas id="wheel" width="720" height="720" aria-hidden="true"></canvas>
+    <div class="pointer" aria-hidden="true"></div>
+    <button type="button" id="spinBtn" aria-label="开始抽奖">开始</button>
+  </div>
+
+  <div class="result-card" id="resultCard" role="status" aria-live="polite">
+    <div class="result-emoji" id="resultEmoji" aria-hidden="true">🎁</div>
+    <div class="result-info">
+      <div class="result-label">🎉 恭喜抽到</div>
+      <div class="result-name" id="resultName">—</div>
+      <div class="result-detail" id="resultDetail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PALETTE = [
+  ['#ff9a6c','#ff3d6e'],
+  ['#ffc46b','#f4602c'],
+  ['#6ee7c8','#1f6fb2'],
+  ['#ffa36b','#e8443f'],
+  ['#ff9ecb','#e0468c'],
+  ['#a7d8ff','#8f7bff'],
+  ['#d9a97e','#7a4a2b'],
+  ['#b7e97a','#2f9e44'],
+];
+
+const TALENT_ITEMS = [
+  { name:'自选所有天赋',        short:'自选所有天赋',        emoji:'🌈', detail:'',                                   c1:'#ff9a6c', c2:'#ff3d6e' },
+  { name:'自选所有最终天赋',    short:'自选最终天赋',        emoji:'🌟', detail:'不允许携带其他天赋',                  c1:'#ff9a6c', c2:'#ff3d6e' },
+  { name:'双弹飞轮',            short:'双弹飞轮',            emoji:'⚡', detail:'',                                   c1:'#ffc46b', c2:'#f4602c' },
+  { name:'双弹大心脏',          short:'双弹大心脏',          emoji:'⚡', detail:'',                                   c1:'#6ee7c8', c2:'#1f6fb2' },
+  { name:'双弹搏命',            short:'双弹搏命',            emoji:'⚡', detail:'',                                   c1:'#ffa36b', c2:'#e8443f' },
+  { name:'飞轮大心脏',          short:'飞轮大心脏',          emoji:'💫', detail:'',                                   c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'飞轮搏命',            short:'飞轮搏命',            emoji:'💫', detail:'',                                   c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'搏命大心脏',          short:'搏命大心脏',          emoji:'❤️', detail:'',                                   c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'双弹飞轮',            short:'双弹飞轮·可带',        emoji:'⚡', detail:'允许携带其他天赋',                    c1:'#ff9a6c', c2:'#ff3d6e' },
+  { name:'双弹大心脏',          short:'双弹大心脏·可带',      emoji:'⚡', detail:'允许携带其他天赋',                    c1:'#ffc46b', c2:'#f4602c' },
+  { name:'双弹搏命',            short:'双弹搏命·可带',        emoji:'⚡', detail:'允许携带其他天赋',                    c1:'#6ee7c8', c2:'#1f6fb2' },
+  { name:'飞轮大心脏',          short:'飞轮大心脏·可带',      emoji:'💫', detail:'允许携带其他天赋',                    c1:'#ffa36b', c2:'#e8443f' },
+  { name:'飞轮搏命',            short:'飞轮搏命·可带',        emoji:'💫', detail:'允许携带其他天赋',                    c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'搏命大心脏',          short:'搏命大心脏·可带',      emoji:'❤️', detail:'允许携带其他天赋',                    c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'八卦阵',              short:'八卦阵·一层',          emoji:'🧭', detail:'只能带一层',                          c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'先天八卦阵',          short:'先天八卦阵·一层',      emoji:'🧭', detail:'只能带一层',                          c1:'#ff9a6c', c2:'#ff3d6e' },
+  { name:'八卦阵',              short:'八卦阵·自选级数',      emoji:'🧭', detail:'能点多级的可以自选',                  c1:'#ffc46b', c2:'#f4602c' },
+  { name:'先天八卦阵',          short:'先天八卦阵·自选级数',  emoji:'🧭', detail:'能点多级的可以自选',                  c1:'#6ee7c8', c2:'#1f6fb2' },
+  { name:'上天赋',              short:'上天赋',              emoji:'⬆️', detail:'',                                   c1:'#ffa36b', c2:'#e8443f' },
+  { name:'下天赋',              short:'下天赋',              emoji:'⬇️', detail:'',                                   c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'左天赋',              short:'左天赋',              emoji:'⬅️', detail:'',                                   c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'右天赋',              short:'右天赋',              emoji:'➡️', detail:'',                                   c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'上天赋',              short:'上天赋·无最终',        emoji:'⬆️', detail:'不带最终天赋版',                      c1:'#ffa36b', c2:'#e8443f' },
+  { name:'下天赋',              short:'下天赋·无最终',        emoji:'⬇️', detail:'不带最终天赋版',                      c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'左天赋',              short:'左天赋·无最终',        emoji:'⬅️', detail:'不带最终天赋版',                      c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'右天赋',              short:'右天赋·无最终',        emoji:'➡️', detail:'不带最终天赋版',                      c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'双弹',                short:'双弹·禁带',            emoji:'⚡', detail:'不允许携带其他天赋',                  c1:'#ffa36b', c2:'#e8443f' },
+  { name:'飞轮',                short:'飞轮·禁带',            emoji:'💫', detail:'不允许携带其他天赋',                  c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'搏命',                short:'搏命·禁带',            emoji:'❤️', detail:'不允许携带其他天赋',                  c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'大心脏',              short:'大心脏·禁带',          emoji:'💗', detail:'不允许携带其他天赋',                  c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'双弹',                short:'双弹·可带无终',        emoji:'⚡', detail:'允许携带其他天赋，不可包含最终天赋',    c1:'#ffa36b', c2:'#e8443f' },
+  { name:'飞轮',                short:'飞轮·可带无终',        emoji:'💫', detail:'允许携带其他天赋，不可包含最终天赋',    c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'搏命',                short:'搏命·可带无终',        emoji:'❤️', detail:'允许携带其他天赋，不可包含最终天赋',    c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'大心脏',              short:'大心脏·可带无终',      emoji:'💗', detail:'允许携带其他天赋，不可包含最终天赋',    c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'双弹',                short:'双弹·可带含终',        emoji:'⚡', detail:'允许携带其他天赋，可包含最终天赋',      c1:'#ffa36b', c2:'#e8443f' },
+  { name:'飞轮',                short:'飞轮·可带含终',        emoji:'💫', detail:'允许携带其他天赋，可包含最终天赋',      c1:'#ff9ecb', c2:'#e0468c' },
+  { name:'搏命',                short:'搏命·可带含终',        emoji:'❤️', detail:'允许携带其他天赋，可包含最终天赋',      c1:'#a7d8ff', c2:'#8f7bff' },
+  { name:'大心脏',              short:'大心脏·可带含终',      emoji:'💗', detail:'允许携带其他天赋，可包含最终天赋',      c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'不允许带任何天赋',    short:'禁带任何天赋',        emoji:'🚫', detail:'',                                   c1:'#d9a97e', c2:'#7a4a2b' },
+  { name:'不允许带任何最终天赋',short:'禁带最终天赋',        emoji:'🚫', detail:'',                                   c1:'#b7e97a', c2:'#2f9e44' }
+];
+
+const HUMAN_LIST = [
+  { name:'幸运儿',     emoji:'🍀' },
+  { name:'医生',       emoji:'💉' },
+  { name:'律师',       emoji:'📖' },
+  { name:'慈善家',     emoji:'🔦' },
+  { name:'园丁',       emoji:'🌿' },
+  { name:'魔术师',     emoji:'🎩' },
+  { name:'冒险家',     emoji:'🧭' },
+  { name:'佣兵',       emoji:'🦾' },
+  { name:'空军',       emoji:'📡' },
+  { name:'机械师',     emoji:'🤖' },
+  { name:'前锋',       emoji:'🏈' },
+  { name:'盲女',       emoji:'🦯' },
+  { name:'祭司',       emoji:'🗝️' },
+  { name:'调香师',     emoji:'💐' },
+  { name:'牛仔',       emoji:'🤠' },
+  { name:'舞女',       emoji:'💃' },
+  { name:'先知',       emoji:'🦉' },
+  { name:'入殓师',     emoji:'⚰️' },
+  { name:'勘探员',     emoji:'⛏️' },
+  { name:'咒术师',     emoji:'🪄' },
+  { name:'野人',       emoji:'🐗' },
+  { name:'杂技演员',   emoji:'🤹' },
+  { name:'大副',       emoji:'⚓' },
+  { name:'调酒师',     emoji:'🍸' },
+  { name:'邮差',       emoji:'✉️' },
+  { name:'守墓人',     emoji:'🪦' },
+  { name:'囚徒',       emoji:'⚡' },
+  { name:'画家',       emoji:'🎨' },
+  { name:'击球手',     emoji:'🏏' },
+  { name:'玩具商',     emoji:'🧸' },
+  { name:'心理学家',   emoji:'🧠' },
+  { name:'病患',       emoji:'🩹' },
+  { name:'小说家',     emoji:'📝' },
+  { name:'小女孩',     emoji:'🎀' },
+  { name:'哭泣小丑',   emoji:'🤡' },
+  { name:'教授',       emoji:'🎓' },
+  { name:'古董商',     emoji:'🏺' },
+  { name:'作曲家',     emoji:'🎼' },
+  { name:'记者',       emoji:'📰' },
+  { name:'飞行家',     emoji:'✈️' },
+  { name:'拉拉队员',   emoji:'📣' },
+  { name:'木偶师',     emoji:'🪆' },
+  { name:'火灾调查员', emoji:'🔥' },
+  { name:'法罗女士',   emoji:'🃏' },
+  { name:'骑士',       emoji:'⚔️' },
+  { name:'气象学家',   emoji:'🌦️' },
+  { name:'弓箭手',     emoji:'🏹' },
+  { name:'逃脱大师',   emoji:'🔓' },
+  { name:'幻灯师',     emoji:'🏮' },
+  { name:'斗牛士',     emoji:'🐂' },
+  { name:'默剧艺人',   emoji:'🎭' },
+  { name:'神童',       emoji:'🌟' }
+];
+
+const HUNTER_LIST = [
+  { name:'厂长',             emoji:'🔧' },
+  { name:'小丑',             emoji:'🤡' },
+  { name:'鹿头',             emoji:'🦌' },
+  { name:'杰克',             emoji:'🔪' },
+  { name:'蜘蛛',             emoji:'🕷️' },
+  { name:'红蝶',             emoji:'🦋' },
+  { name:'黄衣之主',         emoji:'🐙' },
+  { name:'宿伞之魂',         emoji:'☂️' },
+  { name:'约瑟夫（摄影师）', emoji:'📷' },
+  { name:'疯眼',             emoji:'🖥️' },
+  { name:'梦之女巫',         emoji:'🌙' },
+  { name:'爱哭鬼',           emoji:'🪓' },
+  { name:'孽蜥',             emoji:'🦎' },
+  { name:'红夫人',           emoji:'👑' },
+  { name:'邦邦（26号守卫）', emoji:'💣' },
+  { name:'使徒',             emoji:'🐈' },
+  { name:'小提琴家',         emoji:'🎻' },
+  { name:'雕刻家',           emoji:'🗿' },
+  { name:'博士',             emoji:'🪚' },
+  { name:'破轮',             emoji:'🌹' },
+  { name:'渔女',             emoji:'🐟' },
+  { name:'蜡像师',           emoji:'🕯️' },
+  { name:'噩梦',             emoji:'🌑' },
+  { name:'记录员',           emoji:'📝' },
+  { name:'隐士',             emoji:'⚡' },
+  { name:'守夜人',           emoji:'🏮' },
+  { name:'歌剧演员',         emoji:'🎭' },
+  { name:'愚人金',           emoji:'🪙' },
+  { name:'时空之影',         emoji:'⏳' },
+  { name:'跛脚羊',           emoji:'🐐' },
+  { name:'喧嚣',             emoji:'🎪' },
+  { name:'杂货商',           emoji:'🛒' },
+  { name:'台球手',           emoji:'🎱' },
+  { name:'女王蜂',           emoji:'🐝' },
+  { name:'牙医',             emoji:'🦷' },
+  { name:'心兽',             emoji:'💗' }
+];
+
+function buildItems(list){
+  return list.map((it, i) => ({
+    name   : it.name,
+    short  : it.short || it.name,
+    emoji  : it.emoji || '🎁',
+    detail : it.detail || '',
+    c1     : it.c1 || PALETTE[i % PALETTE.length][0],
+    c2     : it.c2 || PALETTE[i % PALETTE.length][1]
+  }));
+}
+
+const MODES = {
+  human : { items: buildItems(HUMAN_LIST)  },
+  hunter: { items: buildItems(HUNTER_LIST) },
+  talent: { items: TALENT_ITEMS            }
+};
+
+const canvas = document.getElementById('wheel');
+const ctx    = canvas.getContext('2d');
+const S      = canvas.width;  
+const R      = S / 2 - 18;     
+const offCanvas = document.createElement('canvas');
+offCanvas.width  = S;
+offCanvas.height = S;
+const offCtx = offCanvas.getContext('2d');
+const FONT_FAMILY = 'system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+const TEXT_OUTER     = R - 46;      
+const TEXT_INNER_MIN = 112;        
+const TEXT_MAX_W     = TEXT_OUTER - TEXT_INNER_MIN;
+const prefersReducedMotion =
+  window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let items    = [];               
+let N        = 0;                 
+let SEG      = 0;                   
+let TEXTS    = [];                    
+let rotation = -Math.PI / 2;          
+let spinning = false;
+let spinToken = 0;                   
+let currentMode = 'talent';
+
+function computeTexts(){
+  const out = [];
+  for (const it of items){
+    const raw = it.short || it.name;
+    let chosen = null;
+    for (let fs = 30; fs >= 11; fs--){
+      ctx.font = `800 ${fs}px ${FONT_FAMILY}`;
+      const w = ctx.measureText(raw).width;
+      if (w > TEXT_MAX_W) continue;
+      const rIn = TEXT_OUTER - w;            
+      if (rIn * SEG >= fs * 1.15){
+        chosen = { fs, text: raw };
+        break;
+      }
+    }
+
+    if (!chosen){                             
+      const fs = 11;
+      ctx.font = `800 ${fs}px ${FONT_FAMILY}`;
+      let t = raw;
+      while (t.length > 1 && ctx.measureText(t + '…').width > TEXT_MAX_W){
+        t = t.slice(0, -1);
+      }
+      chosen = { fs, text: t.length < raw.length ? t + '…' : t };
+    }
+    out.push(chosen);
+  }
+  return out;
+}
+
+function renderStaticWheel(){
+  offCtx.clearRect(0, 0, S, S);
+  offCtx.save();
+  offCtx.translate(S / 2, S / 2);
+  offCtx.beginPath();
+  offCtx.arc(0, 0, R + 8, 0, Math.PI * 2);
+  offCtx.lineWidth = 12;
+  offCtx.strokeStyle = 'rgba(255,255,255,0.9)';
+  offCtx.stroke();
+  for (let i = 0; i < N; i++){
+    const a0 = i * SEG;
+    const a1 = a0 + SEG;
+    const it = items[i];
+    const grad = offCtx.createRadialGradient(0, 0, 24, 0, 0, R);
+    grad.addColorStop(0, it.c1);
+    grad.addColorStop(1, it.c2);
+    offCtx.beginPath();
+    offCtx.moveTo(0, 0);
+    offCtx.arc(0, 0, R, a0, a1);
+    offCtx.closePath();
+    offCtx.fillStyle = grad;
+    offCtx.fill();
+    offCtx.lineWidth = 3;
+    offCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+    offCtx.stroke();
+  }
+
+  for (let i = 0; i < N; i++){
+    const mid  = i * SEG + SEG / 2;
+    const { fs, text } = TEXTS[i];
+    offCtx.save();
+    offCtx.rotate(mid);
+    offCtx.font = `800 ${fs}px ${FONT_FAMILY}`;
+    offCtx.textBaseline = 'middle';
+    offCtx.fillStyle = '#ffffff';
+    offCtx.shadowColor = 'rgba(0,0,0,.45)';
+    offCtx.shadowBlur = 6;
+    const norm = ((mid % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    if (norm > Math.PI / 2 && norm < Math.PI * 1.5){
+      offCtx.rotate(Math.PI);
+      offCtx.textAlign = 'left';
+      offCtx.fillText(text, -TEXT_OUTER, 0);
+    } else {
+      offCtx.textAlign = 'right';
+      offCtx.fillText(text, TEXT_OUTER, 0);
+    }
+    offCtx.restore();
+  }
+
+  offCtx.beginPath();
+  offCtx.arc(0, 0, 74, 0, Math.PI * 2);
+  offCtx.fillStyle = '#170f2c';
+  offCtx.fill();
+  offCtx.lineWidth = 4;
+  offCtx.strokeStyle = 'rgba(255,255,255,.25)';
+  offCtx.stroke();
+  offCtx.restore();
+}
+
+function drawWheel(){
+  ctx.clearRect(0, 0, S, S);
+  ctx.save();
+  ctx.translate(S / 2, S / 2);
+  ctx.rotate(rotation);
+  ctx.drawImage(offCanvas, -S / 2, -S / 2);
+  ctx.restore();
+}
+
+const spinBtn      = document.getElementById('spinBtn');
+const resultCard   = document.getElementById('resultCard');
+const resultEmoji  = document.getElementById('resultEmoji');
+const resultName   = document.getElementById('resultName');
+const resultDetail = document.getElementById('resultDetail');
+function easeOutQuart(t){ return 1 - Math.pow(1 - t, 4); }
+function spin(){
+  if (spinning) return;
+  spinning = true;
+  const my = ++spinToken;
+  spinBtn.disabled = true;
+  spinBtn.textContent = '抽奖中';
+  spinBtn.setAttribute('aria-label', '抽奖中');
+  resultCard.classList.remove('show');
+  const idx = Math.floor(Math.random() * N);         
+  const targetMod = -Math.PI / 2 - (idx + 0.5) * SEG; 
+  const startRot = rotation;
+  const turns = prefersReducedMotion ? 1 : (6 + Math.floor(Math.random() * 3));
+  const k = Math.ceil((startRot + turns * Math.PI * 2 - targetMod) / (Math.PI * 2));
+  const endRot = targetMod + k * Math.PI * 2;
+  const duration = prefersReducedMotion ? 320 : (3600 + Math.random() * 700);
+  const t0 = performance.now();
+  function frame(now){
+    if (my !== spinToken) return;                   
+    const p = Math.min(1, (now - t0) / duration);
+    rotation = startRot + (endRot - startRot) * easeOutQuart(p);
+    drawWheel();
+    if (p < 1){
+      requestAnimationFrame(frame);
+    } else {
+      rotation = endRot % (Math.PI * 2);
+      spinning = false;
+      spinBtn.disabled = false;
+      spinBtn.textContent = '再来';
+      spinBtn.setAttribute('aria-label', '再来一次');
+      showResult(idx);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function showResult(idx){
+  const it = items[idx];
+  if (!it) return;
+  resultEmoji.textContent = it.emoji || '🎁';
+  resultName.textContent   = it.name;       
+  resultDetail.textContent = it.detail || ''; 
+  resultCard.classList.add('show');
+  setTimeout(() => {
+    if (!resultCard.classList.contains('show')) return;
+    resultCard.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }, 120);
+}
+
+function setMode(mode){
+  if (!MODES[mode]) return;
+  if (mode === currentMode) return;  
+  currentMode = mode;
+  spinToken++;                  
+  spinning = false;
+  items = MODES[mode].items;
+  N     = items.length;
+  SEG   = Math.PI * 2 / N;
+  TEXTS = computeTexts();
+  rotation = -Math.PI / 2;      
+  spinBtn.disabled = false;
+  spinBtn.textContent = '开始';
+  spinBtn.setAttribute('aria-label', '开始抽奖');
+  resultCard.classList.remove('show');
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    const on = btn.dataset.mode === mode;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  renderStaticWheel();
+  drawWheel();
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+items = MODES[currentMode].items;
+N     = items.length;
+SEG   = Math.PI * 2 / N;
+TEXTS = computeTexts();
+renderStaticWheel();
+drawWheel();
+spinBtn.addEventListener('click', spin);
+</script>
+</body>
+</html>
